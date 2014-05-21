@@ -3,6 +3,7 @@ package de.andreasgiemza.ubicomproject;
 import java.io.IOException;
 import java.net.SocketException;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import android.app.Service;
@@ -28,6 +29,7 @@ public class FtpServer extends Service {
 	// Constants
 	private final static String TAG = "FTPServer";
 	private final static boolean DEBUG = true;
+	protected static final String uploadPath = "/uploads/";
 
 	// FTPClient
 	private FTPClient mFtpclient = new FTPClient();
@@ -82,6 +84,9 @@ public class FtpServer extends Service {
 					status = mFtpclient.login("187687-giemza.org",
 							"UbiComProject");
 
+					mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
+					mFtpclient.changeWorkingDirectory(uploadPath);
+					
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
 
