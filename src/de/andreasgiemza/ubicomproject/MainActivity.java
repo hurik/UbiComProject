@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -37,6 +39,7 @@ public class MainActivity extends Activity {
 	}
 
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		// TODO Deaktieveren? Filter? Loacal?
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Double currentLatitude = intent.getDoubleExtra("LocationLatitude",
@@ -45,13 +48,17 @@ public class MainActivity extends Activity {
 					"LocationLongitude", 0);
 
 			if (myMarker == null) {
-				myMarker = new MarkerOptions().position(new LatLng(
-						currentLatitude, currentLongitude));
+				myMarker = new MarkerOptions()
+						.icon(BitmapDescriptorFactory
+								.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+						.position(new LatLng(currentLatitude, currentLongitude));
 
 				// adding marker
 				googleMap.addMarker(myMarker);
-			} else
+			} else {
+				// Update position
 				myMarker.position(new LatLng(currentLatitude, currentLongitude));
+			}
 		}
 	};
 }

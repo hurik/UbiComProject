@@ -17,7 +17,6 @@ public class LocationService extends Service {
 	private LocationManager locationManager;
 	private MyLocationListener listener;
 	private Location previousBestLocation = null;
-	private Intent intent;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -27,19 +26,12 @@ public class LocationService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		intent = new Intent(BROADCAST_ACTION);
-
-		Toast.makeText(getApplicationContext(), "LocationService created!",
-				Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		locationManager.removeUpdates(listener);
-
-		Toast.makeText(getApplicationContext(), "LocationService destroyed!",
-				Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -47,15 +39,16 @@ public class LocationService extends Service {
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		listener = new MyLocationListener();
 		locationManager.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER, 4000, 1, listener);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				4000, 0, listener);
+				LocationManager.NETWORK_PROVIDER, 4000, 5, listener);
+		locationManager.requestLocationUpdates(
+				LocationManager.PASSIVE_PROVIDER, 4000, 5, listener);
+		// TODO Energiesparende Variante ermitteln
 	}
 
 	public class MyLocationListener implements LocationListener {
 		public void onLocationChanged(final Location loc) {
 			if (isBetterLocation(loc, previousBestLocation)) {
-				intent.putExtra("Location", loc);
+				Intent intent = new Intent(BROADCAST_ACTION);
 			    intent.putExtra("LocationLatitude", loc.getLatitude());
 			    intent.putExtra("LocationLongitude", loc.getLongitude());
 				LocalBroadcastManager.getInstance(getApplicationContext())
@@ -64,13 +57,9 @@ public class LocationService extends Service {
 		}
 
 		public void onProviderDisabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Disabled",
-					Toast.LENGTH_SHORT).show();
 		}
 
 		public void onProviderEnabled(String provider) {
-			Toast.makeText(getApplicationContext(), "Gps Enabled",
-					Toast.LENGTH_SHORT).show();
 		}
 
 		public void onStatusChanged(String provider, int status, Bundle extras) {
