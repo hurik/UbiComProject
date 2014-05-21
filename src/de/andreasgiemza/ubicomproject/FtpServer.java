@@ -25,30 +25,25 @@ import android.widget.Toast;
 
 public class FtpServer extends Service {
 
-	private final static String TAG = "FTP_Class";
+	// Constants
+	private final static String TAG = "FTPServer";
+	private final static boolean DEBUG = true;
 
-	FTPClient mFtpclient = new FTPClient();
+	// FTPClient
+	private FTPClient mFtpclient = new FTPClient();
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		super.onCreate();
 	}
 
 	@Override
-	public void onStart(Intent intent, int startId) {
-		connectingToFtpServer();
-	}
-
-	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		disconnecting();
 		super.onDestroy();
 	}
@@ -58,13 +53,12 @@ public class FtpServer extends Service {
 	 * 
 	 * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
 	 */
-	
-	
-	// @Override
-	// public int onStartCommand(Intent intent, int flags, int startId) {
-	// // TODO Auto-generated method stub
-	// return super.onStartCommand(intent, flags, startId);
-	// }
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		connectingToFtpServer();
+		return super.onStartCommand(intent, flags, startId);
+	}
 
 	private void connectingToFtpServer() {
 
@@ -80,13 +74,14 @@ public class FtpServer extends Service {
 					mFtpclient.connect("ftp.g8j.de", 21);
 					status = mFtpclient.login("187687-giemza.org",
 							"UbiComProject");
-					Log.d(TAG + "connect",
-							"isConnected:" + String.valueOf(status));
+
+					if (DEBUG)
+						Log.d(TAG + "connect",
+								"isConnected:" + String.valueOf(status));
+
 				} catch (SocketException e) {
-					// TODO: handle exception
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -102,9 +97,7 @@ public class FtpServer extends Service {
 		try {
 			status = mFtpclient.logout();
 			mFtpclient.disconnect();
-			Toast.makeText(getApplicationContext(), "disconnected",
-					Toast.LENGTH_LONG).show();
-			;
+			Log.d(TAG, "disconnecting");
 		} catch (IOException e) {
 
 		}
