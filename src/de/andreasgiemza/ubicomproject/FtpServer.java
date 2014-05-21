@@ -48,6 +48,10 @@ public class FtpServer extends Service {
 		super.onDestroy();
 	}
 
+	public boolean isConnected() {
+		return mFtpclient.isConnected();
+	}
+	
 	/*
 	 * Starts with the Service (non-Javadoc)
 	 * 
@@ -72,6 +76,7 @@ public class FtpServer extends Service {
 					if (DEBUG)
 						Log.d(TAG, "connecting to FTP-Server");
 
+					// TODO passwort "verstekcen"
 					mFtpclient.setConnectTimeout(10 * 1000);
 					mFtpclient.connect("ftp.g8j.de", 21);
 					status = mFtpclient.login("187687-giemza.org",
