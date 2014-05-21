@@ -49,6 +49,7 @@
         </activity>
 
         <service android:name=".LocationService" />
+        <service android:name=".FtpServer" />
     </application>
 
 </manifest>

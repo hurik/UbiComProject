@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
 
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
+		startService(new Intent(getBaseContext(), FtpServer.class));
 	}
 
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
