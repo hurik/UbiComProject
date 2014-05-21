@@ -69,15 +69,16 @@ public class FtpServer extends Service {
 			public void run() {
 				try {
 
-					Log.d(TAG, "connecting to FTP-Server");
+					if (DEBUG)
+						Log.d(TAG, "connecting to FTP-Server");
+
 					mFtpclient.setConnectTimeout(10 * 1000);
 					mFtpclient.connect("ftp.g8j.de", 21);
 					status = mFtpclient.login("187687-giemza.org",
 							"UbiComProject");
 
 					if (DEBUG)
-						Log.d(TAG + "connect",
-								"isConnected:" + String.valueOf(status));
+						Log.d(TAG, "isConnected:" + String.valueOf(status));
 
 				} catch (SocketException e) {
 					e.printStackTrace();
@@ -97,7 +98,9 @@ public class FtpServer extends Service {
 		try {
 			status = mFtpclient.logout();
 			mFtpclient.disconnect();
-			Log.d(TAG, "disconnecting");
+
+			if (DEBUG)
+				Log.d(TAG, "disconnecting");
 		} catch (IOException e) {
 
 		}
