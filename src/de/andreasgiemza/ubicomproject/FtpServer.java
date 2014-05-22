@@ -58,8 +58,7 @@ public class FtpServer extends Service {
 	 * 
 	 * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
 	 */
-	
-	
+
 	// @Override
 	// public int onStartCommand(Intent intent, int flags, int startId) {
 	// // TODO Auto-generated method stub
