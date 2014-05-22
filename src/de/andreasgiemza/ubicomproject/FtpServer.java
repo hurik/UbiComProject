@@ -1,5 +1,6 @@
 package de.andreasgiemza.ubicomproject;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.SocketException;
 
@@ -7,8 +8,10 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -53,7 +56,32 @@ public class FtpServer extends Service {
 	public boolean isConnected() {
 		return mFtpclient.isConnected();
 	}
-	
+
+	private void write() {
+		// TODO Auto-generated method stub
+
+
+		try {
+			Log.d(TAG, "Current Path: " + mFtpclient.printWorkingDirectory());
+//			FTPFile file = mFtpclient.mlistFile("test.txt");
+//			
+//			
+//			if (!file.isFile() /* && !file.isDirectory() */) {
+				String fileDir = "testfile.txt";
+				FileInputStream in = null;
+				in = new FileInputStream(fileDir);
+				mFtpclient.storeFile(fileDir, in);
+//			}
+
+//			buffout.write(0x01);
+//			buffout.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	/*
 	 * Starts with the Service (non-Javadoc)
 	 * 
@@ -62,6 +90,13 @@ public class FtpServer extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		
+		TelephonyManager mTManager = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+		String mPhoneNumber = mTManager.getLine1Number();
+
+		Log.d(TAG, mPhoneNumber);
+		
+		
 		connectingToFtpServer();
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -86,7 +121,10 @@ public class FtpServer extends Service {
 
 					mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
 					mFtpclient.changeWorkingDirectory(uploadPath);
-					
+
+					// Test
+					write();
+
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
 
