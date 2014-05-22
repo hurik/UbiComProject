@@ -60,21 +60,20 @@ public class FtpServer extends Service {
 	private void write() {
 		// TODO Auto-generated method stub
 
-
 		try {
 			Log.d(TAG, "Current Path: " + mFtpclient.printWorkingDirectory());
-//			FTPFile file = mFtpclient.mlistFile("test.txt");
-//			
-//			
-//			if (!file.isFile() /* && !file.isDirectory() */) {
-				String fileDir = "testfile.txt";
-				FileInputStream in = null;
-				in = new FileInputStream(fileDir);
-				mFtpclient.storeFile(fileDir, in);
-//			}
+			// FTPFile file = mFtpclient.mlistFile("test.txt");
+			//
+			//
+			// if (!file.isFile() /* && !file.isDirectory() */) {
+			String fileDir = "testfile.txt";
+			FileInputStream in = null;
+			in = new FileInputStream(fileDir);
+			mFtpclient.storeFile(fileDir, in);
+			// }
 
-//			buffout.write(0x01);
-//			buffout.close();
+			// buffout.write(0x01);
+			// buffout.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,14 +89,12 @@ public class FtpServer extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
-		TelephonyManager mTManager = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+
+		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
+				.getSystemService(Context.TELEPHONY_SERVICE);
 		String mPhoneNumber = mTManager.getLine1Number();
 
 		Log.d(TAG, mPhoneNumber);
-		
-		
-		connectingToFtpServer();
 		return super.onStartCommand(intent, flags, startId);
 	}
 
