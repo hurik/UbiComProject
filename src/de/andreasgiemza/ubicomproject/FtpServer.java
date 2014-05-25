@@ -7,10 +7,17 @@ import java.net.SocketException;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,12 +51,19 @@ public class FtpServer extends Service {
 
 	@Override
 	public void onCreate() {
+
+		LocalBroadcastManager.getInstance(getApplicationContext())
+				.registerReceiver(mMessageReceiver,
+						new IntentFilter(LocationService.BROADCAST_ACTION));
+
 		super.onCreate();
 	}
 
 	@Override
 	public void onDestroy() {
 		disconnecting();
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(
+				mMessageReceiver);
 		super.onDestroy();
 	}
 
@@ -151,4 +165,20 @@ public class FtpServer extends Service {
 		}
 		return status;
 	}
+
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		// TODO Deaktieveren? Filter? Loacal?
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Double currentLatitude = intent.getDoubleExtra("LocationLatitude",
+					0);
+			Double currentLongitude = intent.getDoubleExtra(
+					"LocationLongitude", 0);
+
+			Toast.makeText(getApplicationContext(),
+					currentLatitude + " : " + currentLongitude,
+					Toast.LENGTH_LONG).show();
+		}
+	};
+
 }
