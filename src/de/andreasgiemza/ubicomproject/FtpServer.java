@@ -104,14 +104,24 @@ public class FtpServer extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
+		// Telefonnummer auslesen und (erstmal) lokal speicher und ausgeben
 		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		String mPhoneNumber = mTManager.getLine1Number();
 
+		// Nur zum testen
 		Log.d(TAG, mPhoneNumber);
+
+		// starten der Verbindung
+		// connectingToFtpServer();
+
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	/*
+	 * Verbindet sich zu einem FTP-Server. Dazu wird ein neuer Thread gestartet,
+	 * der dann die verbindung aufbaut.
+	 */
 	private void connectingToFtpServer() {
 
 		Thread thread = new Thread(new Runnable() {
@@ -175,6 +185,7 @@ public class FtpServer extends Service {
 			Double currentLongitude = intent.getDoubleExtra(
 					"LocationLongitude", 0);
 
+			// TODO nur zum testen
 			Toast.makeText(getApplicationContext(),
 					currentLatitude + " : " + currentLongitude,
 					Toast.LENGTH_LONG).show();
