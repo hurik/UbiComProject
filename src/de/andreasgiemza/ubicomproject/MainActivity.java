@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
 		//
 		LocalBroadcastManager.getInstance(getApplicationContext())
 				.registerReceiver(mMessageReceiver,
-						new IntentFilter("LocationService"));
+						new IntentFilter(LocationService.BROADCAST_ACTION));
 
 		// Create GoogleMap
 		googleMap = ((MapFragment) getFragmentManager().findFragmentById(
@@ -39,6 +39,13 @@ public class MainActivity extends Activity {
 		startService(new Intent(getBaseContext(), FtpServer.class));
 	}
 
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+		super.onDestroy();
+	}
+	
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 		// TODO Deaktieveren? Filter? Loacal?
 		@Override

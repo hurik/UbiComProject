@@ -9,10 +9,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class LocationService extends Service {
 	public static final String BROADCAST_ACTION = "LocationService";
+	private static final String TAG = "LocationService";
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private LocationManager locationManager;
 	private MyLocationListener listener;
@@ -47,10 +49,13 @@ public class LocationService extends Service {
 
 	public class MyLocationListener implements LocationListener {
 		public void onLocationChanged(final Location loc) {
+
+			Log.d(TAG, "sender: sending new position");
+
 			if (isBetterLocation(loc, previousBestLocation)) {
 				Intent intent = new Intent(BROADCAST_ACTION);
-			    intent.putExtra("LocationLatitude", loc.getLatitude());
-			    intent.putExtra("LocationLongitude", loc.getLongitude());
+				intent.putExtra("LocationLatitude", loc.getLatitude());
+				intent.putExtra("LocationLongitude", loc.getLongitude());
 				LocalBroadcastManager.getInstance(getApplicationContext())
 						.sendBroadcast(intent);
 			}
