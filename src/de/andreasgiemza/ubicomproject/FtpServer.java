@@ -45,7 +45,7 @@ public class FtpServer extends Service {
 	private FTPClient mFtpclient = new FTPClient();
 
 	private static String mPhoneNumber;
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -65,8 +65,7 @@ public class FtpServer extends Service {
 
 		// Nur zum testen
 		Log.d(TAG, mPhoneNumber);
-		
-		
+
 		super.onCreate();
 	}
 
@@ -121,23 +120,25 @@ public class FtpServer extends Service {
 
 		Log.d(TAG, "write()");
 
-		String outputString = new StringBuilder().append(latitude).append(":").append(longitude).toString();
+		String outputString = new StringBuilder().append(latitude).append(":")
+				.append(longitude).toString();
 
 		FileOutputStream outputStream;
 
 		boolean status = false;
 
 		// 1. Step create local chached File
-		File tmpFile = new File(getApplicationContext().getCacheDir(), mPhoneNumber);
+		File tmpFile = new File(getApplicationContext().getCacheDir(),
+				mPhoneNumber);
 
 		try {
 			status = tmpFile.createNewFile();
-			
-			if(!status) {
+
+			if (!status) {
 				Log.e(TAG, "Can't write to file");
 				return;
 			}
-			
+
 			outputStream = new FileOutputStream(tmpFile);
 			outputStream.write(outputString.getBytes());
 			outputStream.close();
@@ -153,14 +154,32 @@ public class FtpServer extends Service {
 			inputStream = new FileInputStream(tmpFile);
 			status = mFtpclient.storeFile(mPhoneNumber, inputStream);
 			inputStream.close();
+
+			if (DEBUG)
+				Log.d(TAG, "Status (sending to FTP): " + status);
+
+			if (DEBUG) {
+				inputStream = new FileInputStream(tmpFile);
+
+				if (!checkFileExists(mPhoneNumber + "-tracking")) {
+					status = mFtpclient.storeFile(mPhoneNumber + "-tracking",
+							inputStream);
+				} else {
+					status = mFtpclient.appendFile(mPhoneNumber + "-tracking",
+							inputStream);
+					// TODO appendFile doesn't work
+				}
+				inputStream.close();
+
+				if (DEBUG)
+					Log.d(TAG, "Status (sending to FTP - DEBUG): " + status);
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		if (DEBUG)
-			Log.d(TAG, "Status (sending to FTP): " + status);
 
 		// clear tmpFile
 		status = tmpFile.delete();
@@ -185,8 +204,6 @@ public class FtpServer extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
-
 
 		// starten der Verbindung
 		connectingToFtpServer();
@@ -223,7 +240,6 @@ public class FtpServer extends Service {
 
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
-
 
 				} catch (SocketException e) {
 					e.printStackTrace();
@@ -268,7 +284,8 @@ public class FtpServer extends Service {
 
 				@Override
 				public void run() {
-					write(String.valueOf(currentLongitude), String.valueOf(currentLatitude));
+					write(String.valueOf(currentLongitude),
+							String.valueOf(currentLatitude));
 				}
 			});
 			thread.start();
