@@ -44,6 +44,8 @@ public class FtpServer extends Service {
 	// FTPClient
 	private FTPClient mFtpclient = new FTPClient();
 
+	private static String mPhoneNumber;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -56,6 +58,15 @@ public class FtpServer extends Service {
 				.registerReceiver(mMessageReceiver,
 						new IntentFilter(LocationService.BROADCAST_ACTION));
 
+		// Telefonnummer auslesen und (erstmal) lokal speicher und ausgeben
+		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		mPhoneNumber = mTManager.getLine1Number();
+
+		// Nur zum testen
+		Log.d(TAG, mPhoneNumber);
+		
+		
 		super.onCreate();
 	}
 
@@ -110,7 +121,6 @@ public class FtpServer extends Service {
 
 		Log.d(TAG, "write()");
 
-		String filename = "0171";
 		String outputString = new StringBuilder().append(latitude).append(":").append(longitude).toString();
 
 		FileOutputStream outputStream;
@@ -118,17 +128,17 @@ public class FtpServer extends Service {
 		boolean status = false;
 
 		// 1. Step create local chached File
-		File fileOut = new File(getApplicationContext().getCacheDir(), filename);
+		File tmpFile = new File(getApplicationContext().getCacheDir(), mPhoneNumber);
 
 		try {
-			status = fileOut.createNewFile();
+			status = tmpFile.createNewFile();
 			
 			if(!status) {
 				Log.e(TAG, "Can't write to file");
 				return;
 			}
 			
-			outputStream = new FileOutputStream(fileOut);
+			outputStream = new FileOutputStream(tmpFile);
 			outputStream.write(outputString.getBytes());
 			outputStream.close();
 		} catch (IOException e1) {
@@ -140,14 +150,8 @@ public class FtpServer extends Service {
 		FileInputStream inputStream;
 
 		try {
-//			inputStream = getApplicationContext().openFileInput(filename);
-			inputStream = new FileInputStream(fileOut);
-
-			// if(checkFileExists(filename)) {
-			// status = mFtpclient.appendFile(filename, inputStream);
-			// } else {
-			status = mFtpclient.storeFile(filename, inputStream);
-			// }
+			inputStream = new FileInputStream(tmpFile);
+			status = mFtpclient.storeFile(mPhoneNumber, inputStream);
 			inputStream.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -158,8 +162,8 @@ public class FtpServer extends Service {
 		if (DEBUG)
 			Log.d(TAG, "Status (sending to FTP): " + status);
 
-		// clear all
-		status = fileOut.delete();
+		// clear tmpFile
+		status = tmpFile.delete();
 
 		if (DEBUG)
 			Log.d(TAG, "Status (deleting File): " + status);
@@ -182,13 +186,7 @@ public class FtpServer extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
-		// Telefonnummer auslesen und (erstmal) lokal speicher und ausgeben
-		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		String mPhoneNumber = mTManager.getLine1Number();
 
-		// Nur zum testen
-		Log.d(TAG, mPhoneNumber);
 
 		// starten der Verbindung
 		connectingToFtpServer();
