@@ -110,8 +110,8 @@ public class FtpServer extends Service {
 
 		Log.d(TAG, "write()");
 
-		String filename = "01715471692";
-		String outputString = "output";
+		String filename = "0171";
+		String outputString = new StringBuilder().append(latitude).append(":").append(longitude).toString();
 
 		FileOutputStream outputStream;
 
@@ -121,7 +121,13 @@ public class FtpServer extends Service {
 		File fileOut = new File(getApplicationContext().getCacheDir(), filename);
 
 		try {
-			fileOut.createNewFile();
+			status = fileOut.createNewFile();
+			
+			if(!status) {
+				Log.e(TAG, "Can't write to file");
+				return;
+			}
+			
 			outputStream = new FileOutputStream(fileOut);
 			outputStream.write(outputString.getBytes());
 			outputStream.close();
@@ -134,7 +140,8 @@ public class FtpServer extends Service {
 		FileInputStream inputStream;
 
 		try {
-			inputStream = getApplicationContext().openFileInput(filename);
+//			inputStream = getApplicationContext().openFileInput(filename);
+			inputStream = new FileInputStream(fileOut);
 
 			// if(checkFileExists(filename)) {
 			// status = mFtpclient.appendFile(filename, inputStream);
@@ -149,8 +156,13 @@ public class FtpServer extends Service {
 		}
 
 		if (DEBUG)
-			Log.d(TAG, "Status: " + status);
+			Log.d(TAG, "Status (sending to FTP): " + status);
 
+		// clear all
+		status = fileOut.delete();
+
+		if (DEBUG)
+			Log.d(TAG, "Status (deleting File): " + status);
 	}
 
 	public boolean checkFileExists(String file) throws IOException {
@@ -214,9 +226,6 @@ public class FtpServer extends Service {
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
 
-					// // Test
-					// write();
-					// read();
 
 				} catch (SocketException e) {
 					e.printStackTrace();
@@ -227,7 +236,6 @@ public class FtpServer extends Service {
 				}
 			}
 		});
-
 		thread.start();
 	}
 
@@ -262,8 +270,7 @@ public class FtpServer extends Service {
 
 				@Override
 				public void run() {
-					write(String.valueOf(1000),
-							String.valueOf(-1000.0));
+					write(String.valueOf(currentLongitude), String.valueOf(currentLatitude));
 				}
 			});
 			thread.start();
