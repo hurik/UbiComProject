@@ -102,11 +102,16 @@ public class FtpServer extends Service {
 
 	}
 
-	private void write() {
+	private void write(String longitude, String latitude) {
+
+		// Check if connected
+		if (!isConnected())
+			return;
+
 		Log.d(TAG, "write()");
 
 		String filename = "01715471692";
-		String testString = "Hello World!";
+		String outputString = "output";
 
 		FileOutputStream outputStream;
 
@@ -118,30 +123,24 @@ public class FtpServer extends Service {
 		try {
 			fileOut.createNewFile();
 			outputStream = new FileOutputStream(fileOut);
-			outputStream.write(testString.getBytes());
+			outputStream.write(outputString.getBytes());
 			outputStream.close();
 		} catch (IOException e1) {
 
 			e1.printStackTrace();
 		}
 
-		/*
-		 * TODO appendFile()
-		 */
-
-		
-		
 		// 2. Step copy file from internal storage to ftp
 		FileInputStream inputStream;
 
 		try {
 			inputStream = getApplicationContext().openFileInput(filename);
-			
-//			if(checkFileExists(filename)) {
-//				status = mFtpclient.appendFile(filename, inputStream);
-//			} else {
-				status = mFtpclient.storeFile(filename, inputStream);
-//			}			
+
+			// if(checkFileExists(filename)) {
+			// status = mFtpclient.appendFile(filename, inputStream);
+			// } else {
+			status = mFtpclient.storeFile(filename, inputStream);
+			// }
 			inputStream.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -155,13 +154,13 @@ public class FtpServer extends Service {
 	}
 
 	public boolean checkFileExists(String file) throws IOException {
-		
+
 		InputStream inputStream = mFtpclient.retrieveFileStream(file);
 		if (inputStream == null)
 			return false;
 		return true;
 	}
-	
+
 	/*
 	 * Starts with the Service (non-Javadoc)
 	 * 
@@ -215,9 +214,9 @@ public class FtpServer extends Service {
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
 
-					// Test
-					write();
-					read();
+					// // Test
+					// write();
+					// read();
 
 				} catch (SocketException e) {
 					e.printStackTrace();
@@ -250,15 +249,24 @@ public class FtpServer extends Service {
 		// TODO Deaktieveren? Filter? Loacal?
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Double currentLatitude = intent.getDoubleExtra("LocationLatitude",
-					0);
-			Double currentLongitude = intent.getDoubleExtra(
+			final Double currentLatitude = intent.getDoubleExtra(
+					"LocationLatitude", 0);
+			final Double currentLongitude = intent.getDoubleExtra(
 					"LocationLongitude", 0);
 
 			// TODO nur zum testen
 			Toast.makeText(getApplicationContext(),
 					currentLatitude + " : " + currentLongitude,
 					Toast.LENGTH_LONG).show();
+			Thread thread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					write(String.valueOf(1000),
+							String.valueOf(-1000.0));
+				}
+			});
+			thread.start();
 		}
 	};
 
