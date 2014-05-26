@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketException;
 
 import org.apache.commons.net.ftp.FTP;
@@ -128,12 +129,19 @@ public class FtpServer extends Service {
 		 * TODO appendFile()
 		 */
 
+		
+		
 		// 2. Step copy file from internal storage to ftp
 		FileInputStream inputStream;
 
 		try {
 			inputStream = getApplicationContext().openFileInput(filename);
-			status = mFtpclient.storeFile(filename, inputStream);
+			
+//			if(checkFileExists(filename)) {
+//				status = mFtpclient.appendFile(filename, inputStream);
+//			} else {
+				status = mFtpclient.storeFile(filename, inputStream);
+//			}			
 			inputStream.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -146,6 +154,14 @@ public class FtpServer extends Service {
 
 	}
 
+	public boolean checkFileExists(String file) throws IOException {
+		
+		InputStream inputStream = mFtpclient.retrieveFileStream(file);
+		if (inputStream == null)
+			return false;
+		return true;
+	}
+	
 	/*
 	 * Starts with the Service (non-Javadoc)
 	 * 
