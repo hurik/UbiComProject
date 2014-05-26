@@ -1,15 +1,14 @@
 package de.andreasgiemza.ubicomproject;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -71,27 +70,79 @@ public class FtpServer extends Service {
 		return mFtpclient.isConnected();
 	}
 
-	private void write() {
-		// TODO Auto-generated method stub
+	private void read() {
+		String filename = "01715471692";
+
+		int ch;
+		StringBuffer fileContent = new StringBuffer("");
+		Byte[] testString = null;
+
+		FileInputStream inputStream;
+
+		boolean status = false;
+
+		// 1. Step create local chached File
 
 		try {
-			Log.d(TAG, "Current Path: " + mFtpclient.printWorkingDirectory());
-			// FTPFile file = mFtpclient.mlistFile("test.txt");
-			//
-			//
-			// if (!file.isFile() /* && !file.isDirectory() */) {
-			String fileDir = "testfile.txt";
-			FileInputStream in = null;
-			in = new FileInputStream(fileDir);
-			mFtpclient.storeFile(fileDir, in);
-			// }
+			inputStream = getApplicationContext().openFileInput(filename);
+			try {
+				while ((ch = inputStream.read()) != -1)
+					fileContent.append((char) ch);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e1) {
 
-			// buffout.write(0x01);
-			// buffout.close();
+			e1.printStackTrace();
+		}
+
+		String data = new String(fileContent);
+		Log.d("READED STRING", data);
+
+	}
+
+	private void write() {
+		Log.d(TAG, "write()");
+
+		String filename = "01715471692";
+		String testString = "Hello World!";
+
+		FileOutputStream outputStream;
+
+		boolean status = false;
+
+		// 1. Step create local chached File
+		File fileOut = new File(getApplicationContext().getCacheDir(), filename);
+
+		try {
+			fileOut.createNewFile();
+			outputStream = new FileOutputStream(fileOut);
+			outputStream.write(testString.getBytes());
+			outputStream.close();
+		} catch (IOException e1) {
+
+			e1.printStackTrace();
+		}
+
+		/*
+		 * TODO appendFile()
+		 */
+
+		// 2. Step copy file from internal storage to ftp
+		FileInputStream inputStream;
+
+		try {
+			inputStream = getApplicationContext().openFileInput(filename);
+			status = mFtpclient.storeFile(filename, inputStream);
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		if (DEBUG)
+			Log.d(TAG, "Status: " + status);
 
 	}
 
@@ -113,7 +164,7 @@ public class FtpServer extends Service {
 		Log.d(TAG, mPhoneNumber);
 
 		// starten der Verbindung
-		// connectingToFtpServer();
+		connectingToFtpServer();
 
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -143,11 +194,14 @@ public class FtpServer extends Service {
 					mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
 					mFtpclient.changeWorkingDirectory(uploadPath);
 
-					// Test
-					write();
+					Log.d(TAG, mFtpclient.printWorkingDirectory());
 
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
+
+					// Test
+					write();
+					read();
 
 				} catch (SocketException e) {
 					e.printStackTrace();
