@@ -1,15 +1,20 @@
 package de.andreasgiemza.ubicomproject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -35,6 +40,12 @@ import android.widget.Toast;
  */
 
 public class FtpServer extends Service {
+
+	public class UbiCom_Pos {
+		public String number;
+		public String Latitude;
+		public String Longtitude;
+	}
 
 	// Constants
 	private final static String TAG = "FTPServer";
@@ -81,35 +92,92 @@ public class FtpServer extends Service {
 		return mFtpclient.isConnected();
 	}
 
-	private void read() {
-		String filename = "01715471692";
+	private ArrayList<UbiCom_Pos> read() {
 
-		int ch;
-		StringBuffer fileContent = new StringBuffer("");
-		Byte[] testString = null;
+		if (!mFtpclient.isConnected())
+			return null;
 
-		FileInputStream inputStream;
-
+		String filename = "chached";
 		boolean status = false;
 
 		// 1. Step create local chached File
+		File downloadFile = new File(getApplicationContext().getCacheDir(),
+				filename);
+		OutputStream outputStream = null;
 
 		try {
-			inputStream = getApplicationContext().openFileInput(filename);
-			try {
-				while ((ch = inputStream.read()) != -1)
-					fileContent.append((char) ch);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (IOException e1) {
-
-			e1.printStackTrace();
+			downloadFile.createNewFile();
+			outputStream = new FileOutputStream(downloadFile);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		String data = new String(fileContent);
-		Log.d("READED STRING", data);
+		// 2. Copy file from Server
+		try {
+			FTPFile[] files = mFtpclient.listFiles();
+			for (int i = 0; i < files.length; i++) {
 
+				if (!files[i].isFile())
+					continue;
+
+				Log.d(TAG + "_Filename", files[i].getName());
+
+				String remoteFileName = files[i].getName();
+
+				outputStream.write(remoteFileName.getBytes());
+				outputStream.write(':');
+
+				mFtpclient.retrieveFile(remoteFileName, outputStream);
+
+				outputStream.write('\n');
+			}
+			outputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 3. read from input and write it to Array
+		FileInputStream inputStream;
+		ArrayList<UbiCom_Pos> list = new ArrayList<>();
+
+		try {
+			inputStream = new FileInputStream(downloadFile);
+			InputStreamReader isr = new InputStreamReader(inputStream);
+			BufferedReader reader = new BufferedReader(isr);
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				Log.d(TAG + "_Ausgabe", line);
+
+				String[] string = line.split(":");
+
+				if(string.length != 3)
+					continue;
+				
+				UbiCom_Pos l = new UbiCom_Pos();
+				l.number = string[0];
+				Log.d(TAG + "_Ausgabe0", l.number);
+
+				l.Latitude = string[1];
+				Log.d(TAG + "_Ausgabe1", l.Latitude);
+
+				l.Longtitude = string[2];
+				Log.d(TAG + "_Ausgabe2", l.Longtitude);
+
+				list.add(l);
+			}
+
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// clear data
+		downloadFile.delete();
+
+		return list;
 	}
 
 	private void write(String longitude, String latitude) {
