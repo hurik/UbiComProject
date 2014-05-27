@@ -185,27 +185,28 @@ public class FtpServer extends Service {
 
 	private void write(String longitude, String latitude) {
 
+		if (DEBUG)
+			Log.d(TAG, "write to, but first check connection...");
+
 		// Check if connected
 		if (!isConnected())
 			return;
 
-		String outputString = new StringBuilder().append(latitude).append(":")
-				.append(longitude).toString();
+		if (DEBUG)
+			Log.d(TAG, "write to FTP");
 
 		FileOutputStream outputStream;
 
 		boolean status = false;
 
 		// 1. Step create local chached File
-		File tmpFile = new File(getApplicationContext().getCacheDir(),
-				mPhoneNumber);
+		File tmpFile = null;
 
 		try {
-			status = tmpFile.createNewFile();
+			tmpFile = File.createTempFile(mPhoneNumber, "loc");
 
-			if (!status) {
-				return;
-			}
+			String outputString = new StringBuilder().append(latitude)
+					.append(":").append(longitude).toString();
 
 			outputStream = new FileOutputStream(tmpFile);
 			outputStream.write(outputString.getBytes());
@@ -286,6 +287,9 @@ public class FtpServer extends Service {
 					mFtpclient.connect("ftp.g8j.de", 21);
 					status = mFtpclient.login("187687-giemza.org",
 							"UbiComProject");
+
+					if (DEBUG)
+						Log.d(TAG, "is connected");
 
 					mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
 					mFtpclient.changeWorkingDirectory(uploadPath);

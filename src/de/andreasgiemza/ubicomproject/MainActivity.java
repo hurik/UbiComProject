@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 				R.id.map)).getMap();
 
 		// show own position
-		googleMap.setMyLocationEnabled(true);
+//		googleMap.setMyLocationEnabled(true);
 		
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
