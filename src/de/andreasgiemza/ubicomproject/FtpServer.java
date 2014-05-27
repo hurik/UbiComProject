@@ -16,8 +16,6 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-import com.google.android.gms.internal.is;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
