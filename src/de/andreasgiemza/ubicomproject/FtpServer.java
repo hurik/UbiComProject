@@ -16,6 +16,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import com.google.android.gms.internal.is;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -105,7 +107,11 @@ public class FtpServer extends Service {
 		OutputStream outputStream = null;
 
 		try {
-			downloadFile.createNewFile();
+			status = downloadFile.createNewFile();
+
+			if (!status)
+				return null;
+
 			outputStream = new FileOutputStream(downloadFile);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -124,7 +130,12 @@ public class FtpServer extends Service {
 				outputStream.write(remoteFileName.getBytes());
 				outputStream.write(':');
 
-				mFtpclient.retrieveFile(remoteFileName, outputStream);
+				status = mFtpclient.retrieveFile(remoteFileName, outputStream);
+
+				if (!status) {
+					outputStream.close();
+					return null;
+				}
 
 				outputStream.write('\n');
 			}
@@ -158,7 +169,10 @@ public class FtpServer extends Service {
 				list.add(l);
 			}
 
+			reader.close();
+			isr.close();
 			inputStream.close();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -177,8 +191,6 @@ public class FtpServer extends Service {
 		if (!isConnected())
 			return;
 
-		Log.d(TAG, "write()");
-
 		String outputString = new StringBuilder().append(latitude).append(":")
 				.append(longitude).toString();
 
@@ -194,7 +206,6 @@ public class FtpServer extends Service {
 			status = tmpFile.createNewFile();
 
 			if (!status) {
-				Log.e(TAG, "Can't write to file");
 				return;
 			}
 
@@ -248,6 +259,9 @@ public class FtpServer extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
 		// starten der Verbindung
+		// TODO
+		// sollte beim senden/lesen selbständig verbinden/trennen
+		// so ist nicht sichergestellt das es immer verbunden ist
 		connectingToFtpServer();
 
 		return super.onStartCommand(intent, flags, startId);
@@ -324,7 +338,7 @@ public class FtpServer extends Service {
 					"LocationLatitude", 0);
 			final Double currentLongitude = intent.getDoubleExtra(
 					"LocationLongitude", 0);
-			
+
 			Thread thread = new Thread(new Runnable() {
 
 				@Override
