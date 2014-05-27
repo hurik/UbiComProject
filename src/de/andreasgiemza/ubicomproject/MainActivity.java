@@ -34,6 +34,9 @@ public class MainActivity extends Activity {
 		googleMap = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.map)).getMap();
 
+		// show own position
+		googleMap.setMyLocationEnabled(true);
+		
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
 		startService(new Intent(getBaseContext(), FtpServer.class));
