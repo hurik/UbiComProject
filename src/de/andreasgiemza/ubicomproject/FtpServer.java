@@ -25,7 +25,6 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * TODO download commons-net-3.3-bin.zip at
@@ -202,9 +201,9 @@ public class FtpServer extends Service {
 			outputStream = new FileOutputStream(tmpFile);
 			outputStream.write(outputString.getBytes());
 			outputStream.close();
-		} catch (IOException e1) {
+		} catch (IOException e) {
 
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 
 		// 2. Step copy file from internal storage to ftp
@@ -217,23 +216,6 @@ public class FtpServer extends Service {
 
 			if (DEBUG)
 				Log.d(TAG, "Status (sending to FTP): " + status);
-
-			if (DEBUG) {
-				inputStream = new FileInputStream(tmpFile);
-
-				if (!checkFileExists(mPhoneNumber + "-tracking")) {
-					status = mFtpclient.storeFile(mPhoneNumber + "-tracking",
-							inputStream);
-				} else {
-					status = mFtpclient.appendFile(mPhoneNumber + "-tracking",
-							inputStream);
-					// TODO appendFile doesn't work
-				}
-				inputStream.close();
-
-				if (DEBUG)
-					Log.d(TAG, "Status (sending to FTP - DEBUG): " + status);
-			}
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -342,11 +324,7 @@ public class FtpServer extends Service {
 					"LocationLatitude", 0);
 			final Double currentLongitude = intent.getDoubleExtra(
 					"LocationLongitude", 0);
-
-			// TODO nur zum testen
-			Toast.makeText(getApplicationContext(),
-					currentLatitude + " : " + currentLongitude,
-					Toast.LENGTH_LONG).show();
+			
 			Thread thread = new Thread(new Runnable() {
 
 				@Override
