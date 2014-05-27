@@ -92,7 +92,7 @@ public class FtpServer extends Service {
 		return mFtpclient.isConnected();
 	}
 
-	private ArrayList<UbiCom_Pos> read() {
+	public ArrayList<UbiCom_Pos> read() {
 
 		if (!mFtpclient.isConnected())
 			return null;
@@ -120,8 +120,6 @@ public class FtpServer extends Service {
 				if (!files[i].isFile())
 					continue;
 
-				Log.d(TAG + "_Filename", files[i].getName());
-
 				String remoteFileName = files[i].getName();
 
 				outputStream.write(remoteFileName.getBytes());
@@ -147,22 +145,16 @@ public class FtpServer extends Service {
 
 			String line;
 			while ((line = reader.readLine()) != null) {
-				Log.d(TAG + "_Ausgabe", line);
 
 				String[] string = line.split(":");
 
-				if(string.length != 3)
+				if (string.length != 3)
 					continue;
-				
+
 				UbiCom_Pos l = new UbiCom_Pos();
 				l.number = string[0];
-				Log.d(TAG + "_Ausgabe0", l.number);
-
 				l.Latitude = string[1];
-				Log.d(TAG + "_Ausgabe1", l.Latitude);
-
 				l.Longtitude = string[2];
-				Log.d(TAG + "_Ausgabe2", l.Longtitude);
 
 				list.add(l);
 			}
@@ -305,6 +297,13 @@ public class FtpServer extends Service {
 					mFtpclient.changeWorkingDirectory(uploadPath);
 
 					Log.d(TAG, mFtpclient.printWorkingDirectory());
+
+					// ArrayList<UbiCom_Pos> list = read();
+					// for(UbiCom_Pos ret : list) {
+					// Log.e(TAG + "_retval", ret.number);
+					// Log.e(TAG + "_retval", ret.Latitude);
+					// Log.e(TAG + "_retval", ret.Longtitude);
+					// }
 
 					if (DEBUG)
 						Log.d(TAG, "isConnected:" + String.valueOf(status));
