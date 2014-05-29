@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -35,8 +33,8 @@ public class MainActivity extends Activity {
 				R.id.map)).getMap();
 
 		// show own position
-//		googleMap.setMyLocationEnabled(true);
-		
+		// googleMap.setMyLocationEnabled(true);
+
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
 		startService(new Intent(getBaseContext(), FtpServer.class));
@@ -45,10 +43,11 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(
+				mMessageReceiver);
 		super.onDestroy();
 	}
-	
+
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 		// TODO Deaktieveren? Filter? Loacal?
 		@Override
