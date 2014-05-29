@@ -1,129 +1,168 @@
 package de.andreasgiemza.ubicomproject;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-public class LocationService extends Service {
+public class LocationService extends Service implements
+		GooglePlayServicesClient.ConnectionCallbacks,
+		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
 	public static final String BROADCAST_ACTION = "LocationService";
-	private static final String TAG = "LocationService";
-	private static final int TWO_MINUTES = 1000 * 60 * 2;
-	private LocationManager locationManager;
-	private MyLocationListener listener;
-	private Location previousBestLocation = null;
+	private static final int MILLISECONDS_PER_SECOND = 1000;
+	private static final int UPDATE_INTERVAL_IN_SECONDS = 60;
+	public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
+			* UPDATE_INTERVAL_IN_SECONDS;
+	private static final int FASTEST_INTERVAL_IN_SECONDS = 30;
+	public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
+			* FASTEST_INTERVAL_IN_SECONDS;
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
+	IBinder mBinder = new LocalBinder();
+	private LocationClient mLocationClient;
+	private LocationRequest mLocationRequest;
+	// Flag that indicates if a request is underway.
+	private boolean mInProgress;
+	private Boolean servicesAvailable = false;
+
+	// Information for testing
+	File debugFile = new File(Environment.getExternalStorageDirectory(),
+			"location.txt");
+
+	public class LocalBinder extends Binder {
+		public LocationService getServerInstance() {
+			return LocationService.this;
+		}
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		mInProgress = false;
+		// Create the LocationRequest object
+		mLocationRequest = LocationRequest.create();
+		// Use high accuracy
+		mLocationRequest
+				.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+		// Set the update interval to 5 seconds
+		mLocationRequest.setInterval(UPDATE_INTERVAL);
+		// Set the fastest update interval to 1 second
+		mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+		servicesAvailable = servicesConnected();
+		/*
+		 * Create a new location client, using the enclosing class to handle
+		 * callbacks.
+		 */
+		mLocationClient = new LocationClient(this, this, this);
+	}
+
+	private boolean servicesConnected() {
+		// Check that Google Play services is available
+		int resultCode = GooglePlayServicesUtil
+				.isGooglePlayServicesAvailable(this);
+		// If Google Play services is available
+		if (ConnectionResult.SUCCESS == resultCode) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		super.onStartCommand(intent, flags, startId);
+		if (!servicesAvailable || mLocationClient.isConnected() || mInProgress)
+			return START_STICKY;
+		setUpLocationClientIfNeeded();
+		if (!mLocationClient.isConnected() || !mLocationClient.isConnecting()
+				&& !mInProgress) {
+			mInProgress = true;
+			mLocationClient.connect();
+		}
+		return START_STICKY;
+	}
+
+	private void setUpLocationClientIfNeeded() {
+		if (mLocationClient == null)
+			mLocationClient = new LocationClient(this, this, this);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		locationManager.removeUpdates(listener);
+		// Turn off the request flag
+		mInProgress = false;
+		if (servicesAvailable && mLocationClient != null) {
+			mLocationClient.removeLocationUpdates(this);
+			// Destroy the current location client
+			mLocationClient = null;
+		}
 	}
 
 	@Override
-	public void onStart(Intent intent, int startId) {
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		listener = new MyLocationListener();
-		locationManager.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER, 4000, 5, listener);
-		locationManager.requestLocationUpdates(
-				LocationManager.PASSIVE_PROVIDER, 4000, 5, listener);
-		// TODO Energiesparende Variante ermitteln
+	public IBinder onBind(Intent intent) {
+		return mBinder;
 	}
 
-	public class MyLocationListener implements LocationListener {
-		public void onLocationChanged(final Location loc) {
+	@Override
+	public void onConnected(Bundle bundle) {
+		// Request location updates using static settings
+		mLocationClient.requestLocationUpdates(mLocationRequest, this);
+	}
 
-			Log.d(TAG, "sender: sending new position");
+	@Override
+	public void onDisconnected() {
+		// Turn off the request flag
+		mInProgress = false;
+		// Destroy the current location client
+		mLocationClient = null;
+	}
 
-			if (isBetterLocation(loc, previousBestLocation)) {
-				Intent intent = new Intent(BROADCAST_ACTION);
-				intent.putExtra("LocationLatitude", loc.getLatitude());
-				intent.putExtra("LocationLongitude", loc.getLongitude());
-				LocalBroadcastManager.getInstance(getApplicationContext())
-						.sendBroadcast(intent);
-			}
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+		mInProgress = false;
+		/*
+		 * Google Play services can resolve some errors it detects. If the error
+		 * has a resolution, try sending an Intent to start a Google Play
+		 * services activity that can resolve error.
+		 */
+		if (connectionResult.hasResolution()) {
+			// If no resolution is available, display an error dialog
+		} else {
+
 		}
+	}
 
-		public void onProviderDisabled(String provider) {
-		}
+	@Override
+	public void onLocationChanged(Location location) {
+		// DataServer.INSTANCE.uploadPosition(location);
 
-		public void onProviderEnabled(String provider) {
-		}
+		DateFormat dfmt = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss");
 
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-		protected boolean isBetterLocation(Location location,
-				Location currentBestLocation) {
-			if (currentBestLocation == null) {
-				// A new location is always better than no location
-				return true;
-			}
-
-			// Check whether the new location fix is newer or older
-			long timeDelta = location.getTime() - currentBestLocation.getTime();
-			boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-			boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-			boolean isNewer = timeDelta > 0;
-
-			// If it's been more than two minutes since the current location,
-			// use
-			// the new location
-			// because the user has likely moved
-			if (isSignificantlyNewer) {
-				return true;
-				// If the new location is more than two minutes older, it must
-				// be worse
-			} else if (isSignificantlyOlder) {
-				return false;
-			}
-
-			// Check whether the new location fix is more or less accurate
-			int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation
-					.getAccuracy());
-			boolean isLessAccurate = accuracyDelta > 0;
-			boolean isMoreAccurate = accuracyDelta < 0;
-			boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-			// Check if the old and new location are from the same provider
-			boolean isFromSameProvider = isSameProvider(location.getProvider(),
-					currentBestLocation.getProvider());
-
-			// Determine location quality using a combination of timeliness and
-			// accuracy
-			if (isMoreAccurate) {
-				return true;
-			} else if (isNewer && !isLessAccurate) {
-				return true;
-			} else if (isNewer && !isSignificantlyLessAccurate
-					&& isFromSameProvider) {
-				return true;
-			}
-			return false;
-		}
-
-		// Checks whether two providers are the same
-		private boolean isSameProvider(String provider1, String provider2) {
-			if (provider1 == null) {
-				return provider2 == null;
-			}
-			return provider1.equals(provider2);
+		FileWriter fw;
+		try {
+			fw = new FileWriter(debugFile, true);
+			fw.write(dfmt.format(new Date()) + ";" + location.getLatitude()
+					+ ";" + location.getLongitude() + "\n");
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
