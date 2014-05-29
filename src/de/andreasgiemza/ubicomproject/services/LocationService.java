@@ -1,11 +1,21 @@
-package de.andreasgiemza.ubicomproject;
+package de.andreasgiemza.ubicomproject.services;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.IBinder;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -14,13 +24,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import android.app.Service;
-import android.content.Intent;
-import android.location.Location;
-import android.os.Binder;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.IBinder;
+import de.andreasgiemza.ubicomproject.DataServer;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
@@ -151,15 +155,14 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// DataServer.INSTANCE.uploadPosition(location);
-
-		DateFormat dfmt = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss");
-
-		FileWriter fw;
 		try {
-			fw = new FileWriter(debugFile, true);
-			fw.write(dfmt.format(new Date()) + ";" + location.getLatitude()
-					+ ";" + location.getLongitude() + "\n");
+			FileWriter fw = new FileWriter(debugFile, true);
+			fw.write(new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss")
+					.format(new Date())
+					+ ";"
+					+ location.getLatitude()
+					+ ";"
+					+ location.getLongitude() + "\n");
 			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -17,6 +17,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import de.andreasgiemza.ubicomproject.services.LocationService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;

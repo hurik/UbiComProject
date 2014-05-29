@@ -7,6 +7,8 @@ import android.os.Bundle;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 
+import de.andreasgiemza.ubicomproject.services.LocationService;
+
 public class MainActivity extends Activity {
 
 	private GoogleMap googleMap;
