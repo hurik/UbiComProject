@@ -7,11 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,8 +20,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-
-import de.andreasgiemza.ubicomproject.DataServer;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
