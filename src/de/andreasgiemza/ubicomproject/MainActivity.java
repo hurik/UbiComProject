@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,8 +37,8 @@ public class MainActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.settings:
-			Toast.makeText(getApplicationContext(), "Settings clicked!",
-					Toast.LENGTH_SHORT).show();
+			startActivity(new Intent(getApplicationContext(),
+					SettingsActivity.class));
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
