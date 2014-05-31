@@ -1,5 +1,20 @@
 # UbiComProject #
 
+## Classes ##
+
+### MainActivity.java ###
+Shows own location and locations of near friends.
+
+### services.BootBroadcastReceiver.java ###
+Starts the LocationService and 
+
+### services.LocationService.java ###
+Service which gets the own location and upload it on the FTP server.
+
+### services.NotificationService.java ###
+Service which gets the location of known numbers from the FTP server and provide them for the MainActicity.java. It also creates notifications, if a friend is near.
+
+
 ## Tutorials ##
 
 1. [Android working with Google Maps V2](http://www.androidhive.info/2013/08/android-working-with-google-maps-v2/)

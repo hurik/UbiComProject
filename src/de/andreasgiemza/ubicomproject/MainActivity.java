@@ -1,75 +1,54 @@
 package de.andreasgiemza.ubicomproject;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+
+import de.andreasgiemza.ubicomproject.services.LocationService;
 
 public class MainActivity extends Activity {
 
 	private GoogleMap googleMap;
-	private MarkerOptions myMarker = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		//
-		LocalBroadcastManager.getInstance(getApplicationContext())
-				.registerReceiver(mMessageReceiver,
-						new IntentFilter(LocationService.BROADCAST_ACTION));
-
 		// Create GoogleMap
 		googleMap = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.map)).getMap();
 
 		// show own position
-//		googleMap.setMyLocationEnabled(true);
-		
+		googleMap.setMyLocationEnabled(true);
+
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
-		startService(new Intent(getBaseContext(), FtpServer.class));
 	}
 
 	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-		super.onDestroy();
-	}
-	
-	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-		// TODO Deaktieveren? Filter? Loacal?
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Double currentLatitude = intent.getDoubleExtra("LocationLatitude",
-					0);
-			Double currentLongitude = intent.getDoubleExtra(
-					"LocationLongitude", 0);
-
-			if (myMarker == null) {
-				myMarker = new MarkerOptions()
-						.icon(BitmapDescriptorFactory
-								.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-						.position(new LatLng(currentLatitude, currentLongitude));
-
-				// adding marker
-				googleMap.addMarker(myMarker);
-			} else {
-				// Update position
-				myMarker.position(new LatLng(currentLatitude, currentLongitude));
-			}
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.settings:
+			startActivity(new Intent(getApplicationContext(),
+					SettingsActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
-	};
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
 }

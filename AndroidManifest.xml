@@ -11,6 +11,12 @@
     <!-- permission for reading telephone-number -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- permission for writing in flash/sd -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- permission for boot completed -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <!-- Copied from Google Maps Library/AndroidManifest.xml. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -41,6 +47,14 @@
             android:value="@integer/google_play_services_version" />
         <!-- End of copy. -->
 
+        <receiver android:name="de.andreasgiemza.ubicomproject.services.BootBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="de.andreasgiemza.ubicomproject.services.LocationService" />
+
         <activity
             android:name="de.andreasgiemza.ubicomproject.MainActivity"
             android:label="@string/app_name" >
@@ -50,9 +64,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".LocationService" />
-        <service android:name=".FtpServer" />
+        <activity
+            android:name="de.andreasgiemza.ubicomproject.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
 
 </manifest>

@@ -11,11 +11,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import de.andreasgiemza.ubicomproject.services.LocationService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -91,7 +93,7 @@ public class FtpServer extends Service {
 		return mFtpclient.isConnected();
 	}
 
-	public ArrayList<UbiCom_Pos> read() {
+	public List<UbiCom_Pos> read() {
 
 		if (!mFtpclient.isConnected())
 			return null;
@@ -144,7 +146,7 @@ public class FtpServer extends Service {
 
 		// 3. read from input and write it to Array
 		FileInputStream inputStream;
-		ArrayList<UbiCom_Pos> list = new ArrayList<>();
+		List<UbiCom_Pos> list = new ArrayList<>();
 
 		try {
 			inputStream = new FileInputStream(downloadFile);
@@ -299,7 +301,7 @@ public class FtpServer extends Service {
 
 					Log.d(TAG, mFtpclient.printWorkingDirectory());
 
-					// ArrayList<UbiCom_Pos> list = read();
+					// List<UbiCom_Pos> list = read();
 					// for(UbiCom_Pos ret : list) {
 					// Log.e(TAG + "_retval", ret.number);
 					// Log.e(TAG + "_retval", ret.Latitude);
