@@ -220,6 +220,9 @@ public class FtpServer extends Service {
 		FileInputStream inputStream;
 
 		try {
+			if(tmpFile == null)
+				Log.e(TAG, "tmpFile is null");
+			
 			inputStream = new FileInputStream(tmpFile);
 			status = mFtpclient.storeFile(mPhoneNumber, inputStream);
 			inputStream.close();
