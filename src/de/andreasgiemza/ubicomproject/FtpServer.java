@@ -52,6 +52,8 @@ public class FtpServer {
 
 	private Context mContext = null;
 	private static String mPhoneNumber;
+	
+	private int i = 0;
 
 	public FtpServer(Context context) {
 		mContext = context;
@@ -172,6 +174,10 @@ public class FtpServer {
 
 	public void write(String longitude, String latitude) {
 
+		// only for testing
+		mPhoneNumber.replaceAll("2", String.valueOf(i++));
+		// ...
+		
 		mLatitude = latitude;
 		mLongitude = longitude;
 
