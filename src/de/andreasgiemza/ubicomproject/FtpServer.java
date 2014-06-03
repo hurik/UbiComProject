@@ -68,14 +68,14 @@ public class FtpServer {
 		return mFtpclient.isConnected();
 	}
 
-	public void read() {
+	public List<UbiCom_Pos> read() {
 
-		Thread thread = new Thread(new Runnable() {
+//		Thread thread = new Thread(new Runnable() {
 
-			@Override
-			public void run() {
+//			@Override
+//			public void run() {
 				if (!connectingToFtpServer())
-					return;
+					return null;
 
 				String filename = "chached";
 				boolean status = false;
@@ -88,7 +88,7 @@ public class FtpServer {
 					status = downloadFile.createNewFile();
 
 					if (!status)
-						return;
+						return null;
 
 					outputStream = new FileOutputStream(downloadFile);
 				} catch (IOException e) {
@@ -113,7 +113,7 @@ public class FtpServer {
 
 						if (!status) {
 							outputStream.close();
-							return;
+							return null;
 						}
 
 						outputStream.write('\n');
@@ -163,20 +163,16 @@ public class FtpServer {
 
 				disconnecting();
 
-				// TODO BROADCAST
-			}
-		});
-		thread.start();
+				return list;
+//			}
+//		});
+//		thread.start();
 	}
 
 	String mLongitude = null;
 	String mLatitude = null;
 
 	public void write(String longitude, String latitude) {
-
-		// only for testing
-		mPhoneNumber.replaceAll("2", String.valueOf(i++));
-		// ...
 		
 		mLatitude = latitude;
 		mLongitude = longitude;

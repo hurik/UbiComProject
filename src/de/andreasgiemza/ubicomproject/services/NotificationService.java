@@ -1,5 +1,6 @@
 package de.andreasgiemza.ubicomproject.services;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,6 +9,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import de.andreasgiemza.ubicomproject.FtpServer;
+import de.andreasgiemza.ubicomproject.FtpServer.UbiCom_Pos;
+
 
 public class NotificationService extends Service {
 
@@ -37,7 +40,7 @@ public class NotificationService extends Service {
 				}
 
 				Log.d(TAG, "mFtpServer.read()");
-				mFtpServer.read();
+				List<UbiCom_Pos> list = mFtpServer.read();
 			}
 		}, (long) 0, (long) ((PERIOD_MIN * 60) + PERIOD_SEC) * 1000);
 		
