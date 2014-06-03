@@ -66,10 +66,6 @@ public class FtpServer extends Service {
 	@Override
 	public void onCreate() {
 
-		LocalBroadcastManager.getInstance(getApplicationContext())
-				.registerReceiver(mMessageReceiver,
-						new IntentFilter(LocationService.BROADCAST_ACTION));
-
 		// Telefonnummer auslesen und (erstmal) lokal speicher und ausgeben
 		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
@@ -185,64 +181,79 @@ public class FtpServer extends Service {
 		return list;
 	}
 
-	private void write(String longitude, String latitude) {
+	String mLongitude = null;
+	String mLatitude = null;
+	public void write(String longitude, String latitude) {
 
-		if (DEBUG)
-			Log.d(TAG, "write to, but first check connection...");
+		mLatitude = latitude;
+		mLongitude = longitude;
+		
+		Thread thread = new Thread(new Runnable() {
 
-		// Check if connected
-		if (!isConnected())
-			return;
+			@Override
+			public void run() {
+				if (DEBUG)
+					Log.d(TAG, "write to, but first check connection...");
 
-		if (DEBUG)
-			Log.d(TAG, "write to FTP");
+				// Check if connected
+				if (!connectingToFtpServer())
+					return;
 
-		FileOutputStream outputStream;
+				if (DEBUG)
+					Log.d(TAG, "write to FTP");
 
-		boolean status = false;
+				FileOutputStream outputStream;
 
-		// 1. Step create local chached File
-		File tmpFile = null;
+				boolean status = false;
 
-		try {
-			tmpFile = File.createTempFile(mPhoneNumber, "loc");
+				// 1. Step create local chached File
+				File tmpFile = null;
 
-			String outputString = new StringBuilder().append(latitude)
-					.append(":").append(longitude).toString();
+				try {
+					tmpFile = File.createTempFile(mPhoneNumber, "loc");
 
-			outputStream = new FileOutputStream(tmpFile);
-			outputStream.write(outputString.getBytes());
-			outputStream.close();
-		} catch (IOException e) {
+					String outputString = new StringBuilder().append(mLatitude)
+							.append(":").append(mLongitude).toString();
 
-			e.printStackTrace();
-		}
+					outputStream = new FileOutputStream(tmpFile);
+					outputStream.write(outputString.getBytes());
+					outputStream.close();
+				} catch (IOException e) {
 
-		// 2. Step copy file from internal storage to ftp
-		FileInputStream inputStream;
+					e.printStackTrace();
+				}
 
-		try {
-			if(tmpFile == null)
-				Log.e(TAG, "tmpFile is null");
-			
-			inputStream = new FileInputStream(tmpFile);
-			status = mFtpclient.storeFile(mPhoneNumber, inputStream);
-			inputStream.close();
+				// 2. Step copy file from internal storage to ftp
+				FileInputStream inputStream;
 
-			if (DEBUG)
-				Log.d(TAG, "Status (sending to FTP): " + status);
+				try {
+					if (tmpFile == null)
+						Log.e(TAG, "tmpFile is null");
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+					inputStream = new FileInputStream(tmpFile);
+					status = mFtpclient.storeFile(mPhoneNumber, inputStream);
+					inputStream.close();
 
-		// clear tmpFile
-		status = tmpFile.delete();
+					if (DEBUG)
+						Log.d(TAG, "Status (sending to FTP): " + status);
 
-		if (DEBUG)
-			Log.d(TAG, "Status (deleting File): " + status);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				// clear tmpFile
+				status = tmpFile.delete();
+
+				if (DEBUG)
+					Log.d(TAG, "Status (deleting File): " + status);
+
+				disconnecting();
+			}
+		});
+		thread.start();
+
 	}
 
 	public boolean checkFileExists(String file) throws IOException {
@@ -275,52 +286,38 @@ public class FtpServer extends Service {
 	 * Verbindet sich zu einem FTP-Server. Dazu wird ein neuer Thread gestartet,
 	 * der dann die verbindung aufbaut.
 	 */
-	private void connectingToFtpServer() {
+	private boolean connectingToFtpServer() {
 
-		Thread thread = new Thread(new Runnable() {
-			boolean status = false;
+		boolean status = false;
+		try {
 
-			@Override
-			public void run() {
-				try {
+			if (DEBUG)
+				Log.d(TAG, "connecting to FTP-Server");
 
-					if (DEBUG)
-						Log.d(TAG, "connecting to FTP-Server");
+			// TODO passwort "verstekcen"
+			mFtpclient.setConnectTimeout(10 * 1000);
+			mFtpclient.connect("ftp.g8j.de", 21);
+			status = mFtpclient.login("187687-giemza.org", "UbiComProject");
 
-					// TODO passwort "verstekcen"
-					mFtpclient.setConnectTimeout(10 * 1000);
-					mFtpclient.connect("ftp.g8j.de", 21);
-					status = mFtpclient.login("187687-giemza.org",
-							"UbiComProject");
+			if (DEBUG)
+				Log.d(TAG, "is connected");
 
-					if (DEBUG)
-						Log.d(TAG, "is connected");
+			mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
+			mFtpclient.changeWorkingDirectory(uploadPath);
 
-					mFtpclient.setFileType(FTP.ASCII_FILE_TYPE);
-					mFtpclient.changeWorkingDirectory(uploadPath);
+			Log.d(TAG, mFtpclient.printWorkingDirectory());
 
-					Log.d(TAG, mFtpclient.printWorkingDirectory());
+			if (DEBUG)
+				Log.d(TAG, "isConnected:" + String.valueOf(status));
 
-					// List<UbiCom_Pos> list = read();
-					// for(UbiCom_Pos ret : list) {
-					// Log.e(TAG + "_retval", ret.number);
-					// Log.e(TAG + "_retval", ret.Latitude);
-					// Log.e(TAG + "_retval", ret.Longtitude);
-					// }
-
-					if (DEBUG)
-						Log.d(TAG, "isConnected:" + String.valueOf(status));
-
-				} catch (SocketException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		thread.start();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return status;
 	}
 
 	private boolean disconnecting() {
