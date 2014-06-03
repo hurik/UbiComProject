@@ -13,6 +13,10 @@ import android.view.MenuItem;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.andreasgiemza.ubicomproject.services.LocationService;
 import de.andreasgiemza.ubicomproject.services.NotificationService;
@@ -84,8 +88,17 @@ public class MainActivity extends Activity {
 			final Double currentLongitude = intent.getDoubleExtra(
 					NotificationService.BROADCAST_LONGITUDE, 0);
 
-			Log.d("MAIN", currentLatitude + "," + currentLongitude);
+			if(currentLongitude == 0 | currentLatitude == 0)
+				return;
 			
+			Log.d("MAIN", currentLatitude + "," + currentLongitude);
+
+			MarkerOptions mMarker = new MarkerOptions().icon(
+					BitmapDescriptorFactory
+							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+					.position(new LatLng(currentLatitude, currentLongitude));
+			googleMap.addMarker(mMarker);
+
 		};
 
 	};

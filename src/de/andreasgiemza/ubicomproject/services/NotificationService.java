@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import de.andreasgiemza.ubicomproject.FtpServer;
 import de.andreasgiemza.ubicomproject.FtpServer.UbiCom_Pos;
@@ -51,7 +52,7 @@ public class NotificationService extends Service {
 					Intent i = new Intent(BROADCAST_ACTION);
 					i.putExtra(BROADCAST_LATITUDE, l.Latitude);
 					i.putExtra(BROADCAST_LONGITUDE, l.Longtitude);
-					getApplicationContext().sendBroadcast(i);
+					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
 				}
 			}
 		}, (long) 0, (long) ((PERIOD_MIN * 60) + PERIOD_SEC) * 1000);
