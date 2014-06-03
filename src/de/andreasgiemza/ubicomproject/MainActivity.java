@@ -11,6 +11,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 
 import de.andreasgiemza.ubicomproject.services.LocationService;
+import de.andreasgiemza.ubicomproject.services.NotificationService;
 
 public class MainActivity extends Activity {
 
@@ -30,6 +31,7 @@ public class MainActivity extends Activity {
 
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
+		startService(new Intent(getBaseContext(), NotificationService.class));
 	}
 
 	@Override
@@ -50,5 +52,13 @@ public class MainActivity extends Activity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		
+		stopService(new Intent(getBaseContext(), NotificationService.class));
+		
+		super.onDestroy();
 	}
 }
