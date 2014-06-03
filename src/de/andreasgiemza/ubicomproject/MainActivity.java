@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -85,7 +84,6 @@ public class MainActivity extends Activity {
 			final Double currentLongitude = intent.getDoubleExtra(
 					NotificationService.BROADCAST_LONGITUDE, 0);
 
-			Toast.makeText(getApplicationContext(), currentLatitude + "," + currentLongitude, Toast.LENGTH_SHORT).show();
 			Log.d("MAIN", currentLatitude + "," + currentLongitude);
 			
 		};
