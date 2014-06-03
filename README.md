@@ -5,8 +5,11 @@
 ### MainActivity.java ###
 Shows own location and locations of near friends.
 
+###	SettingsActivity.java ###
+Settings for the application, for example your mobile number.
+
 ### services.BootBroadcastReceiver.java ###
-Starts the LocationService and 
+Starts the LocationService and NotificationService after the handy was booted.
 
 ### services.LocationService.java ###
 Service which gets the own location and upload it on the FTP server.
