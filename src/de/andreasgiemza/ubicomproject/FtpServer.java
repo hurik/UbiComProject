@@ -89,105 +89,116 @@ public class FtpServer extends Service {
 		return mFtpclient.isConnected();
 	}
 
-	public List<UbiCom_Pos> read() {
+	public void read() {
 
-		if (!mFtpclient.isConnected())
-			return null;
+		Thread thread = new Thread(new Runnable() {
 
-		String filename = "chached";
-		boolean status = false;
+			@Override
+			public void run() {
+				if (!connectingToFtpServer())
+					return;
 
-		// 1. Step create local chached File
-		File downloadFile = new File(getApplicationContext().getCacheDir(),
-				filename);
-		OutputStream outputStream = null;
+				String filename = "chached";
+				boolean status = false;
 
-		try {
-			status = downloadFile.createNewFile();
+				// 1. Step create local chached File
+				File downloadFile = new File(getApplicationContext()
+						.getCacheDir(), filename);
+				OutputStream outputStream = null;
 
-			if (!status)
-				return null;
+				try {
+					status = downloadFile.createNewFile();
 
-			outputStream = new FileOutputStream(downloadFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+					if (!status)
+						return;
 
-		// 2. Copy file from Server
-		try {
-			FTPFile[] files = mFtpclient.listFiles();
-			for (int i = 0; i < files.length; i++) {
-
-				if (!files[i].isFile())
-					continue;
-
-				String remoteFileName = files[i].getName();
-
-				outputStream.write(remoteFileName.getBytes());
-				outputStream.write(':');
-
-				status = mFtpclient.retrieveFile(remoteFileName, outputStream);
-
-				if (!status) {
-					outputStream.close();
-					return null;
+					outputStream = new FileOutputStream(downloadFile);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 
-				outputStream.write('\n');
+				// 2. Copy file from Server
+				try {
+					FTPFile[] files = mFtpclient.listFiles();
+					for (int i = 0; i < files.length; i++) {
+
+						if (!files[i].isFile())
+							continue;
+
+						String remoteFileName = files[i].getName();
+
+						outputStream.write(remoteFileName.getBytes());
+						outputStream.write(':');
+
+						status = mFtpclient.retrieveFile(remoteFileName,
+								outputStream);
+
+						if (!status) {
+							outputStream.close();
+							return;
+						}
+
+						outputStream.write('\n');
+					}
+					outputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				// 3. read from input and write it to Array
+				FileInputStream inputStream;
+				List<UbiCom_Pos> list = new ArrayList<>();
+
+				try {
+					inputStream = new FileInputStream(downloadFile);
+					InputStreamReader isr = new InputStreamReader(inputStream);
+					BufferedReader reader = new BufferedReader(isr);
+
+					String line;
+					while ((line = reader.readLine()) != null) {
+
+						String[] string = line.split(":");
+
+						if (string.length != 3)
+							continue;
+
+						UbiCom_Pos l = new UbiCom_Pos();
+						l.number = string[0];
+						l.Latitude = string[1];
+						l.Longtitude = string[2];
+
+						list.add(l);
+					}
+
+					reader.close();
+					isr.close();
+					inputStream.close();
+
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				// clear data
+				downloadFile.delete();
+
+				disconnecting();
+
+				// TODO BROADCAST
 			}
-			outputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// 3. read from input and write it to Array
-		FileInputStream inputStream;
-		List<UbiCom_Pos> list = new ArrayList<>();
-
-		try {
-			inputStream = new FileInputStream(downloadFile);
-			InputStreamReader isr = new InputStreamReader(inputStream);
-			BufferedReader reader = new BufferedReader(isr);
-
-			String line;
-			while ((line = reader.readLine()) != null) {
-
-				String[] string = line.split(":");
-
-				if (string.length != 3)
-					continue;
-
-				UbiCom_Pos l = new UbiCom_Pos();
-				l.number = string[0];
-				l.Latitude = string[1];
-				l.Longtitude = string[2];
-
-				list.add(l);
-			}
-
-			reader.close();
-			isr.close();
-			inputStream.close();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// clear data
-		downloadFile.delete();
-
-		return list;
+		});
+		thread.start();
 	}
 
 	String mLongitude = null;
 	String mLatitude = null;
+
 	public void write(String longitude, String latitude) {
 
 		mLatitude = latitude;
 		mLongitude = longitude;
-		
+
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
