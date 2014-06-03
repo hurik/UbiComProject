@@ -17,14 +17,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-import de.andreasgiemza.ubicomproject.services.LocationService;
-import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -40,7 +34,7 @@ import android.util.Log;
  * 
  */
 
-public class FtpServer extends Service {
+public class FtpServer {
 
 	public class UbiCom_Pos {
 		public String number;
@@ -56,33 +50,16 @@ public class FtpServer extends Service {
 	// FTPClient
 	private FTPClient mFtpclient = new FTPClient();
 
+	private Context mContext = null;
 	private static String mPhoneNumber;
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-
-	@Override
-	public void onCreate() {
+	public FtpServer(Context context) {
+		mContext = context;
 
 		// Telefonnummer auslesen und (erstmal) lokal speicher und ausgeben
-		TelephonyManager mTManager = (TelephonyManager) getApplicationContext()
+		TelephonyManager mTManager = (TelephonyManager) mContext
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		mPhoneNumber = mTManager.getLine1Number();
-
-		// Nur zum testen
-		Log.d(TAG, mPhoneNumber);
-
-		super.onCreate();
-	}
-
-	@Override
-	public void onDestroy() {
-		disconnecting();
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(
-				mMessageReceiver);
-		super.onDestroy();
 	}
 
 	public boolean isConnected() {
@@ -102,8 +79,7 @@ public class FtpServer extends Service {
 				boolean status = false;
 
 				// 1. Step create local chached File
-				File downloadFile = new File(getApplicationContext()
-						.getCacheDir(), filename);
+				File downloadFile = new File(mContext.getCacheDir(), filename);
 				OutputStream outputStream = null;
 
 				try {
@@ -276,24 +252,6 @@ public class FtpServer extends Service {
 	}
 
 	/*
-	 * Starts with the Service (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
-	 */
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-
-		// starten der Verbindung
-		// TODO
-		// sollte beim senden/lesen selbständig verbinden/trennen
-		// so ist nicht sichergestellt das es immer verbunden ist
-		connectingToFtpServer();
-
-		return super.onStartCommand(intent, flags, startId);
-	}
-
-	/*
 	 * Verbindet sich zu einem FTP-Server. Dazu wird ein neuer Thread gestartet,
 	 * der dann die verbindung aufbaut.
 	 */
@@ -344,26 +302,4 @@ public class FtpServer extends Service {
 		}
 		return status;
 	}
-
-	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-		// TODO Deaktieveren? Filter? Loacal?
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			final Double currentLatitude = intent.getDoubleExtra(
-					"LocationLatitude", 0);
-			final Double currentLongitude = intent.getDoubleExtra(
-					"LocationLongitude", 0);
-
-			Thread thread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					write(String.valueOf(currentLongitude),
-							String.valueOf(currentLatitude));
-				}
-			});
-			thread.start();
-		}
-	};
-
 }

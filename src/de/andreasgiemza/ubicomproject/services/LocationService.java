@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -20,6 +21,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+
+import de.andreasgiemza.ubicomproject.FtpServer;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
@@ -43,6 +46,8 @@ public class LocationService extends Service implements
 	// Information for testing
 	File debugFile = new File(Environment.getExternalStorageDirectory(),
 			"location.txt");
+
+	FtpServer mFtpServer = null;
 
 	public class LocalBinder extends Binder {
 		public LocationService getServerInstance() {
@@ -70,6 +75,8 @@ public class LocationService extends Service implements
 		 * callbacks.
 		 */
 		mLocationClient = new LocationClient(this, this, this);
+
+		mFtpServer = new FtpServer(getApplicationContext());
 	}
 
 	private boolean servicesConnected() {
@@ -159,6 +166,12 @@ public class LocationService extends Service implements
 					+ ";"
 					+ location.getLongitude() + "\n");
 			fw.close();
+
+			
+			Log.d("LocationSevice", "write to FTP");
+			mFtpServer.write(String.valueOf(location.getLongitude()),
+					String.valueOf(location.getLatitude()));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
