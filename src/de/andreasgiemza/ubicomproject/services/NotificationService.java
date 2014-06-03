@@ -16,8 +16,12 @@ public class NotificationService extends Service {
 
 	private static final String TAG = "NotificationService";
 	
-	private static final int PERIOD_MIN = 2;
-	private static final int PERIOD_SEC = 0;
+	public static final String BROADCAST_ACTION = "FTP_POSITION_RECEIVED";
+	public static final String BROADCAST_LATITUDE = "LocationLatitude"; 
+	public static final String BROADCAST_LONGITUDE = "LocationLongitude"; 
+	
+	private static final int PERIOD_MIN = 0;
+	private static final int PERIOD_SEC = 20;
 	Timer timer = null;
 	FtpServer mFtpServer = null;
 
@@ -41,10 +45,17 @@ public class NotificationService extends Service {
 
 				Log.d(TAG, "mFtpServer.read()");
 				List<UbiCom_Pos> list = mFtpServer.read();
+				
+				if(list != null)				
+				for (UbiCom_Pos l : list) {
+					Intent i = new Intent(BROADCAST_ACTION);
+					i.putExtra(BROADCAST_LATITUDE, l.Latitude);
+					i.putExtra(BROADCAST_LONGITUDE, l.Longtitude);
+					getApplicationContext().sendBroadcast(i);
+				}
 			}
 		}, (long) 0, (long) ((PERIOD_MIN * 60) + PERIOD_SEC) * 1000);
-		
-		
+			
 		super.onCreate();
 	}
 

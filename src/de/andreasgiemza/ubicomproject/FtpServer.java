@@ -46,6 +46,7 @@ public class FtpServer {
 	private final static String TAG = "FTPServer";
 	private final static boolean DEBUG = true;
 	protected static final String uploadPath = "/uploads/";
+	
 
 	// FTPClient
 	private FTPClient mFtpclient = new FTPClient();
@@ -80,8 +81,9 @@ public class FtpServer {
 				String filename = "chached";
 				boolean status = false;
 
+				Log.d(TAG, "First Step: create Local File");
 				// 1. Step create local chached File
-				File downloadFile = new File(mContext.getCacheDir(), filename);
+				File downloadFile = new File(mContext.getExternalCacheDir(), filename);
 				OutputStream outputStream = null;
 
 				try {
@@ -95,6 +97,7 @@ public class FtpServer {
 					e.printStackTrace();
 				}
 
+				Log.d(TAG, "Second Step: copy File");
 				// 2. Copy file from Server
 				try {
 					FTPFile[] files = mFtpclient.listFiles();
@@ -123,6 +126,7 @@ public class FtpServer {
 					e.printStackTrace();
 				}
 
+				Log.d(TAG, "Third Step: read Local File");
 				// 3. read from input and write it to Array
 				FileInputStream inputStream;
 				List<UbiCom_Pos> list = new ArrayList<>();
@@ -142,6 +146,7 @@ public class FtpServer {
 
 						UbiCom_Pos l = new UbiCom_Pos();
 						l.number = string[0];
+						Log.d("RECEIVED", l.number);
 						l.Latitude = string[1];
 						l.Longtitude = string[2];
 

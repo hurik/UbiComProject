@@ -1,11 +1,16 @@
 package de.andreasgiemza.ubicomproject;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -32,6 +37,11 @@ public class MainActivity extends Activity {
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));
 		startService(new Intent(getBaseContext(), NotificationService.class));
+
+		// BroadcastReceiver
+		LocalBroadcastManager.getInstance(getApplicationContext())
+				.registerReceiver(mMessageReceiver,
+						new IntentFilter(NotificationService.BROADCAST_ACTION));
 	}
 
 	@Override
@@ -53,12 +63,32 @@ public class MainActivity extends Activity {
 		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
-		
+
+		LocalBroadcastManager.getInstance(getApplicationContext())
+				.unregisterReceiver(mMessageReceiver);
+
 		stopService(new Intent(getBaseContext(), NotificationService.class));
-		
+
 		super.onDestroy();
 	}
+
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(android.content.Context context, Intent intent) {
+
+			final Double currentLatitude = intent.getDoubleExtra(
+					NotificationService.BROADCAST_LATITUDE, 0);
+			final Double currentLongitude = intent.getDoubleExtra(
+					NotificationService.BROADCAST_LONGITUDE, 0);
+
+			Toast.makeText(getApplicationContext(), currentLatitude + "," + currentLongitude, Toast.LENGTH_SHORT).show();
+			Log.d("MAIN", currentLatitude + "," + currentLongitude);
+			
+		};
+
+	};
 }
