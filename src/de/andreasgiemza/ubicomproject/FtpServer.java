@@ -18,7 +18,6 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import android.content.Context;
-import android.content.Intent;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -46,15 +45,12 @@ public class FtpServer {
 	private final static String TAG = "FTPServer";
 	private final static boolean DEBUG = true;
 	protected static final String uploadPath = "/uploads/";
-	
 
 	// FTPClient
 	private FTPClient mFtpclient = new FTPClient();
 
 	private Context mContext = null;
 	private static String mPhoneNumber;
-	
-	private int i = 0;
 
 	public FtpServer(Context context) {
 		mContext = context;
@@ -71,114 +67,113 @@ public class FtpServer {
 
 	public List<UbiCom_Pos> read() {
 
-//		Thread thread = new Thread(new Runnable() {
+		// Thread thread = new Thread(new Runnable() {
 
-//			@Override
-//			public void run() {
-				if (!connectingToFtpServer())
-					return null;
+		// @Override
+		// public void run() {
+		if (!connectingToFtpServer())
+			return null;
 
-				String filename = "chached";
-				boolean status = false;
+		String filename = "chached";
+		boolean status = false;
 
-				Log.d(TAG, "First Step: create Local File");
-				// 1. Step create local chached File
-				File downloadFile = new File(mContext.getExternalCacheDir(), filename);
-				OutputStream outputStream = null;
+		Log.d(TAG, "First Step: create Local File");
+		// 1. Step create local chached File
+		File downloadFile = new File(mContext.getExternalCacheDir(), filename);
+		OutputStream outputStream = null;
 
-				try {
-					status = downloadFile.createNewFile();
+		try {
+			status = downloadFile.createNewFile();
 
-					if (!status)
-						return null;
+			if (!status)
+				return null;
 
-					outputStream = new FileOutputStream(downloadFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			outputStream = new FileOutputStream(downloadFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-				Log.d(TAG, "Second Step: copy File");
-				// 2. Copy file from Server
-				try {
-					FTPFile[] files = mFtpclient.listFiles();
-					for (int i = 0; i < files.length; i++) {
+		Log.d(TAG, "Second Step: copy File");
+		// 2. Copy file from Server
+		try {
+			FTPFile[] files = mFtpclient.listFiles();
+			for (int i = 0; i < files.length; i++) {
 
-						if (!files[i].isFile())
-							continue;
+				if (!files[i].isFile())
+					continue;
 
-						String remoteFileName = files[i].getName();
+				String remoteFileName = files[i].getName();
 
-						outputStream.write(remoteFileName.getBytes());
-						outputStream.write(':');
+				outputStream.write(remoteFileName.getBytes());
+				outputStream.write(':');
 
-						status = mFtpclient.retrieveFile(remoteFileName,
-								outputStream);
+				status = mFtpclient.retrieveFile(remoteFileName, outputStream);
 
-						if (!status) {
-							outputStream.close();
-							return null;
-						}
-
-						outputStream.write('\n');
-					}
+				if (!status) {
 					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+					return null;
 				}
 
-				Log.d(TAG, "Third Step: read Local File");
-				// 3. read from input and write it to Array
-				FileInputStream inputStream;
-				List<UbiCom_Pos> list = new ArrayList<>();
+				outputStream.write('\n');
+			}
+			outputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-				try {
-					inputStream = new FileInputStream(downloadFile);
-					InputStreamReader isr = new InputStreamReader(inputStream);
-					BufferedReader reader = new BufferedReader(isr);
+		Log.d(TAG, "Third Step: read Local File");
+		// 3. read from input and write it to Array
+		FileInputStream inputStream;
+		List<UbiCom_Pos> list = new ArrayList<>();
 
-					String line;
-					while ((line = reader.readLine()) != null) {
+		try {
+			inputStream = new FileInputStream(downloadFile);
+			InputStreamReader isr = new InputStreamReader(inputStream);
+			BufferedReader reader = new BufferedReader(isr);
 
-						String[] string = line.split(":");
+			String line;
+			while ((line = reader.readLine()) != null) {
 
-						if (string.length != 3)
-							continue;
+				String[] string = line.split(":");
 
-						UbiCom_Pos l = new UbiCom_Pos();
-						l.number = string[0];
-						Log.d("RECEIVED", l.number);
-						l.Latitude = string[1];
-						l.Longtitude = string[2];
+				if (string.length != 3)
+					continue;
 
-						list.add(l);
-					}
+				UbiCom_Pos l = new UbiCom_Pos();
+				l.number = string[0];
+				Log.d("RECEIVED", l.number);
+				l.Latitude = string[1];
+				l.Longtitude = string[2];
 
-					reader.close();
-					isr.close();
-					inputStream.close();
+				list.add(l);
+			}
 
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			reader.close();
+			isr.close();
+			inputStream.close();
 
-				// clear data
-				downloadFile.delete();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-				disconnecting();
+		// clear data
+		downloadFile.delete();
 
-				return list;
-//			}
-//		});
-//		thread.start();
+		disconnecting();
+
+		return list;
+		// }
+		// });
+		// thread.start();
 	}
 
 	String mLongitude = null;
 	String mLatitude = null;
 
 	public void write(String longitude, String latitude) {
-		
+
 		mLatitude = latitude;
 		mLongitude = longitude;
 

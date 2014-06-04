@@ -1,19 +1,11 @@
 package de.andreasgiemza.ubicomproject.services;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -27,14 +19,8 @@ import de.andreasgiemza.ubicomproject.FtpServer;
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
-	public static final String BROADCAST_ACTION = "LocationService";
-	private static final int MILLISECONDS_PER_SECOND = 1000;
-	private static final int UPDATE_INTERVAL_IN_SECONDS = 60;
-	public static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
-			* UPDATE_INTERVAL_IN_SECONDS;
-	private static final int FASTEST_INTERVAL_IN_SECONDS = 30;
-	public static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
-			* FASTEST_INTERVAL_IN_SECONDS;
+	public static final long UPDATE_INTERVAL = 5 * 60 * 1000;
+	public static final long FASTEST_INTERVAL = 60 * 1000;
 
 	IBinder mBinder = new LocalBinder();
 	private LocationClient mLocationClient;
@@ -44,9 +30,6 @@ public class LocationService extends Service implements
 	private Boolean servicesAvailable = false;
 
 	// Information for testing
-	File debugFile = new File(Environment.getExternalStorageDirectory(),
-			"location.txt");
-
 	FtpServer mFtpServer = null;
 
 	public class LocalBinder extends Binder {
@@ -157,23 +140,7 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		try {
-			FileWriter fw = new FileWriter(debugFile, true);
-			fw.write(new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss")
-					.format(new Date())
-					+ ";"
-					+ location.getLatitude()
-					+ ";"
-					+ location.getLongitude() + "\n");
-			fw.close();
-
-			
-			Log.d("LocationSevice", "write to FTP");
-			mFtpServer.write(String.valueOf(location.getLongitude()),
-					String.valueOf(location.getLatitude()));
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// mFtpServer.write(String.valueOf(location.getLongitude()),
+		// String.valueOf(location.getLatitude()));
 	}
 }
