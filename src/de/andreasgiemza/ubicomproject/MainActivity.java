@@ -50,7 +50,11 @@ public class MainActivity extends Activity {
 				.registerReceiver(mMessageReceiver,
 						new IntentFilter(NotificationService.BROADCAST_ACTION));
 
-		// Check number
+		// Check phone number
+		checkPhoneNumber();
+	}
+
+	private void checkPhoneNumber() {
 		SharedPreferences sharedPref = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		String number = sharedPref.getString("settings_number", "");
@@ -66,7 +70,8 @@ public class MainActivity extends Activity {
 				// Number not on sim card
 				startActivity(new Intent(getApplicationContext(),
 						SettingsActivity.class));
-				Toast.makeText(getApplicationContext(), R.string.settings_number_summary, Toast.LENGTH_LONG)
+				Toast.makeText(getApplicationContext(),
+						R.string.settings_number_summary, Toast.LENGTH_LONG)
 						.show();
 			} else {
 				// Number was obtained
@@ -128,7 +133,6 @@ public class MainActivity extends Activity {
 							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 					.position(new LatLng(currentLatitude, currentLongitude));
 			googleMap.addMarker(mMarker);
-
 		};
 	};
 }

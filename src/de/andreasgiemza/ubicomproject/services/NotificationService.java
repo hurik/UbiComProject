@@ -12,15 +12,14 @@ import android.util.Log;
 import de.andreasgiemza.ubicomproject.FtpServer;
 import de.andreasgiemza.ubicomproject.FtpServer.UbiCom_Pos;
 
-
 public class NotificationService extends Service {
 
 	private static final String TAG = "NotificationService";
-	
+
 	public static final String BROADCAST_ACTION = "FTP_POSITION_RECEIVED";
-	public static final String BROADCAST_LATITUDE = "LocationLatitude"; 
-	public static final String BROADCAST_LONGITUDE = "LocationLongitude"; 
-	
+	public static final String BROADCAST_LATITUDE = "LocationLatitude";
+	public static final String BROADCAST_LONGITUDE = "LocationLongitude";
+
 	private static final int PERIOD_MIN = 0;
 	private static final int PERIOD_SEC = 20;
 	Timer timer = null;
@@ -29,8 +28,8 @@ public class NotificationService extends Service {
 	@Override
 	public void onCreate() {
 
-		Log.d(TAG,	"NotificationTask started");
-		
+		Log.d(TAG, "NotificationTask started");
+
 		mFtpServer = new FtpServer(getApplicationContext());
 
 		timer = new Timer();
@@ -46,17 +45,18 @@ public class NotificationService extends Service {
 
 				Log.d(TAG, "mFtpServer.read()");
 				List<UbiCom_Pos> list = mFtpServer.read();
-				
-				if(list != null)				
-				for (UbiCom_Pos l : list) {
-					Intent i = new Intent(BROADCAST_ACTION);
-					i.putExtra(BROADCAST_LATITUDE, l.Latitude);
-					i.putExtra(BROADCAST_LONGITUDE, l.Longtitude);
-					LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-				}
+
+				if (list != null)
+					for (UbiCom_Pos l : list) {
+						Intent i = new Intent(BROADCAST_ACTION);
+						i.putExtra(BROADCAST_LATITUDE, l.Latitude);
+						i.putExtra(BROADCAST_LONGITUDE, l.Longtitude);
+						LocalBroadcastManager.getInstance(
+								getApplicationContext()).sendBroadcast(i);
+					}
 			}
 		}, (long) 0, (long) ((PERIOD_MIN * 60) + PERIOD_SEC) * 1000);
-			
+
 		super.onCreate();
 	}
 
@@ -73,7 +73,7 @@ public class NotificationService extends Service {
 		mFtpServer = null;
 
 		Log.d(TAG, "NoftificationService deleted");
-		
+
 		super.onDestroy();
 	}
 
