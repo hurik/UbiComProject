@@ -28,16 +28,14 @@ public class ServiceWidget extends AppWidgetProvider {
 
 	public static PendingIntent buildButtonPendingIntent(Context context) {
 		Intent intent = new Intent();
-		//intent.setAction("pl.looksok.intent.action.CHANGE_PICTURE");
+		// intent.setAction("pl.looksok.intent.action.CHANGE_PICTURE");
 		return PendingIntent.getBroadcast(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
-		ComponentName myWidget = new ComponentName(context,
-				ServiceWidget.class);
+		ComponentName myWidget = new ComponentName(context, ServiceWidget.class);
 		AppWidgetManager manager = AppWidgetManager.getInstance(context);
 		manager.updateAppWidget(myWidget, remoteViews);
 	}
-
 }

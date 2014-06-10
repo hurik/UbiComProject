@@ -70,5 +70,4 @@ public class NotificationService extends Service {
 
 		super.onDestroy();
 	}
-
 }
