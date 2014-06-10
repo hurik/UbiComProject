@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import de.andreasgiemza.ubicomproject.FtpServer;
+import de.andreasgiemza.ubicomproject.dataserver.DataServer;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
@@ -28,9 +28,6 @@ public class LocationService extends Service implements
 	// Flag that indicates if a request is underway.
 	private boolean mInProgress;
 	private Boolean servicesAvailable = false;
-
-	// Information for testing
-	FtpServer mFtpServer = null;
 
 	public class LocalBinder extends Binder {
 		public LocationService getServerInstance() {
@@ -58,8 +55,6 @@ public class LocationService extends Service implements
 		 * callbacks.
 		 */
 		mLocationClient = new LocationClient(this, this, this);
-
-		mFtpServer = new FtpServer(getApplicationContext());
 	}
 
 	private boolean servicesConnected() {
@@ -140,7 +135,6 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// mFtpServer.write(String.valueOf(location.getLongitude()),
-		// String.valueOf(location.getLatitude()));
+		DataServer.INSTANCE.updatePosition(getApplicationContext(), location);
 	}
 }
