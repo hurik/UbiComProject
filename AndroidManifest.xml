@@ -11,6 +11,20 @@
     <!-- permission for reading telephone-number -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- permission for reading contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- permission for googl cloud messaging -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.example.gcm.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
+
     <!-- permission for boot completed -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -44,15 +58,6 @@
             android:value="@integer/google_play_services_version" />
         <!-- End of copy. -->
 
-        <receiver android:name="de.andreasgiemza.ubicomproject.services.BootBroadcastReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name="de.andreasgiemza.ubicomproject.services.LocationService" />
-        <service android:name="de.andreasgiemza.ubicomproject.services.NotificationService" />
-
         <activity
             android:name="de.andreasgiemza.ubicomproject.MainActivity"
             android:label="@string/app_name" >
@@ -63,20 +68,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.andreasgiemza.ubicomproject.SettingsActivity"
-            android:label="@string/settings" >
+            android:name="de.andreasgiemza.ubicomproject.RegisterActivity"
+            android:label="@string/register" >
         </activity>
 
-        <receiver
-            android:name="de.andreasgiemza.ubicomproject.widget.ServiceWidget"
-            android:label="Example Widget" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+        <service android:name="de.andreasgiemza.ubicomproject.services.LocationService" />
+        <service android:name="de.andreasgiemza.ubicomproject.gcm.GcmIntentService" />
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget" />
+        <receiver android:name="de.andreasgiemza.ubicomproject.services.BootBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="de.andreasgiemza.ubicomproject.gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="de.andreasgiemza.ubicomproject" />
+            </intent-filter>
         </receiver>
     </application>
 

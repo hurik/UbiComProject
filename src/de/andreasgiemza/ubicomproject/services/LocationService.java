@@ -19,7 +19,7 @@ import de.andreasgiemza.ubicomproject.dataserver.DataServer;
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
-	public static final long UPDATE_INTERVAL = 5 * 60 * 1000;
+	public static final long UPDATE_INTERVAL = 2 * 60 * 1000;
 	public static final long FASTEST_INTERVAL = 60 * 1000;
 
 	IBinder mBinder = new LocalBinder();

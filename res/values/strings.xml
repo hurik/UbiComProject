@@ -2,8 +2,9 @@
 <resources>
 
     <string name="app_name">UbiComProject</string>
-    <string name="settings_number">Number</string>
-    <string name="settings_number_summary">Please insert your phone number\n(Example: +49XXXXXXXXXXX)</string>
-    <string name="settings">Settings</string>
+    <string name="register">Register</string>
+    <string name="register_number">Number</string>
+    <string name="register_number_summary">Please insert your phone number, if the field is empty.</string>
+    <string name="register_number_example">+49XXXXXXXXXXX</string>
 
 </resources>
