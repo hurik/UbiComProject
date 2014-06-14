@@ -53,6 +53,40 @@ public class MainActivity extends Activity {
 		LocalBroadcastManager.getInstance(getApplicationContext())
 				.registerReceiver(mMessageReceiver,
 						new IntentFilter(GcmIntentService.BROADCAST_ACTION));
+
+		drawFriends();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		drawFriends();
+	}
+
+	private void drawFriends() {
+		googleMap.clear();
+
+		IconGenerator iconFactory = new IconGenerator(getApplicationContext());
+
+		for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
+				.entrySet()) {
+
+			int elapsedSeconds = (int) ((System.currentTimeMillis() - entry
+					.getValue().time) / 1000);
+
+			if (elapsedSeconds < 60 * 60) {
+				MarkerOptions markerOptions = new MarkerOptions()
+						.icon(BitmapDescriptorFactory.fromBitmap(iconFactory
+								.makeIcon(entry.getKey() + "\n"
+										+ elapsedSeconds + " seconds ago")))
+						.position(entry.getValue().latLng)
+						.anchor(iconFactory.getAnchorU(),
+								iconFactory.getAnchorV());
+
+				googleMap.addMarker(markerOptions);
+			}
+		}
 	}
 
 	@Override
@@ -67,31 +101,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onReceive(android.content.Context context, Intent intent) {
-			googleMap.clear();
-
-			IconGenerator iconFactory = new IconGenerator(context);
-
-			for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
-					.entrySet()) {
-
-				int elapsedSeconds = (int) ((System.currentTimeMillis() - entry
-						.getValue().time) / 1000);
-
-				if (elapsedSeconds < 60 * 60) {
-					MarkerOptions markerOptions = new MarkerOptions()
-							.icon(BitmapDescriptorFactory
-									.fromBitmap(iconFactory.makeIcon(entry
-											.getKey()
-											+ "\n"
-											+ elapsedSeconds
-											+ " seconds ago")))
-							.position(entry.getValue().latLng)
-							.anchor(iconFactory.getAnchorU(),
-									iconFactory.getAnchorV());
-
-					googleMap.addMarker(markerOptions);
-				}
-			}
+			drawFriends();
 		};
 	};
 }
