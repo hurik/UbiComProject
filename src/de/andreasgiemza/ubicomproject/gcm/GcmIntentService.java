@@ -7,12 +7,11 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
+
 public class GcmIntentService extends IntentService {
 
-	public static final String BROADCAST_ACTION = "NotificationService";
-	public static final String BROADCAST_NUMBER = "LocationNumber";
-	public static final String BROADCAST_LATITUDE = "LocationLatitude";
-	public static final String BROADCAST_LONGITUDE = "LocationLongitude";
+	public static final String BROADCAST_ACTION = "PositionUpdated";
 
 	public GcmIntentService() {
 		super("GcmIntentService");
@@ -27,14 +26,17 @@ public class GcmIntentService extends IntentService {
 
 		if (!extras.isEmpty()) {
 			if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-				String[] dfsdf = extras.get("message").toString().split(";");
+				String[] data = extras.get("message").toString().split(";");
 
-				Intent i = new Intent(BROADCAST_ACTION);
-				i.putExtra(BROADCAST_NUMBER, dfsdf[0]);
-				i.putExtra(BROADCAST_LATITUDE, Double.parseDouble(dfsdf[1]));
-				i.putExtra(BROADCAST_LONGITUDE, Double.parseDouble(dfsdf[2]));
-				LocalBroadcastManager.getInstance(getApplicationContext())
-						.sendBroadcast(i);
+				if (data.length == 3) {
+					// Save the new position
+					PositionsStorage.INSTANCE.updatedPosition(data);
+
+					// Inform the the main activity that there is a new position
+					Intent i = new Intent(BROADCAST_ACTION);
+					LocalBroadcastManager.getInstance(getApplicationContext())
+							.sendBroadcast(i);
+				}
 			}
 		}
 		GcmBroadcastReceiver.completeWakefulIntent(intent);

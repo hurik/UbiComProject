@@ -1,20 +1,23 @@
 package de.andreasgiemza.ubicomproject;
 
+import java.util.Map.Entry;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmIntentService;
+import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
+import de.andreasgiemza.ubicomproject.helpers.PositionsStorage.Position;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 import de.andreasgiemza.ubicomproject.location.LocationService;
 
@@ -64,19 +67,31 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onReceive(android.content.Context context, Intent intent) {
-			final Double currentLatitude = intent.getDoubleExtra(
-					GcmIntentService.BROADCAST_LATITUDE, 0);
-			final Double currentLongitude = intent.getDoubleExtra(
-					GcmIntentService.BROADCAST_LONGITUDE, 0);
+			googleMap.clear();
 
-			if (currentLongitude == 0 | currentLatitude == 0)
-				return;
-			Log.d("MAIN", currentLatitude + "," + currentLongitude);
-			MarkerOptions mMarker = new MarkerOptions().icon(
-					BitmapDescriptorFactory
-							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-					.position(new LatLng(currentLatitude, currentLongitude));
-			googleMap.addMarker(mMarker);
+			IconGenerator iconFactory = new IconGenerator(context);
+
+			for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
+					.entrySet()) {
+
+				int elapsedSeconds = (int) ((System.currentTimeMillis() - entry
+						.getValue().time) / 1000);
+
+				if (elapsedSeconds < 60 * 60) {
+					MarkerOptions markerOptions = new MarkerOptions()
+							.icon(BitmapDescriptorFactory
+									.fromBitmap(iconFactory.makeIcon(entry
+											.getKey()
+											+ "\n"
+											+ elapsedSeconds
+											+ " seconds ago")))
+							.position(entry.getValue().latLng)
+							.anchor(iconFactory.getAnchorU(),
+									iconFactory.getAnchorV());
+
+					googleMap.addMarker(markerOptions);
+				}
+			}
 		};
 	};
 }
