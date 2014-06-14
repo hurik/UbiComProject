@@ -1,10 +1,11 @@
-package de.andreasgiemza.ubicomproject.dataserver;
+package de.andreasgiemza.ubicomproject.gcm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -16,19 +17,52 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
-public class JSONParser {
+public enum GcmServer {
+	INSTANCE;
 
-	static InputStream is = null;
-	static JSONObject jObj = null;
-	static String json = "";
+	private InputStream is = null;
+	private JSONObject jObj = null;
+	private String json = "";
 
-	// constructor
-	public JSONParser() {
+	public void register(Context context, String regId) {
+		final Preferences prefs = new Preferences(context);
+
+		List<NameValuePair> getPrarams = new ArrayList<NameValuePair>();
+		getPrarams.add(new BasicNameValuePair("number", prefs.getNumber()));
+		getPrarams.add(new BasicNameValuePair("gcm", regId));
+
+		makeHttpRequest("http://ucp.g8j.de/register.php", "GET", getPrarams);
+	}
+
+	public void updatePosition(Context context, final Location location) {
+		final Preferences prefs = new Preferences(context);
+
+		if (prefs.isRegistered() && checkInternetConnection(context)) {
+			new Thread(new Runnable() {
+				public void run() {
+					String message = prefs.getNumber() + ";"
+							+ String.valueOf(location.getLatitude()) + ";"
+							+ String.valueOf(location.getLongitude());
+
+					List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+					postParams.add(new BasicNameValuePair("message", message));
+
+					makeHttpRequest("http://ucp.g8j.de/update_position.php",
+							"GET", postParams);
+				}
+			}).start();
+		}
 	}
 
 	// function get json from url
@@ -92,5 +126,18 @@ public class JSONParser {
 
 		// return JSON String
 		return jObj;
+	}
+
+	// Helpers
+	private boolean checkInternetConnection(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+		if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+			return true;
+		}
+
+		return false;
 	}
 }

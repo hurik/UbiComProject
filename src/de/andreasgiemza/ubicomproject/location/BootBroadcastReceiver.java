@@ -1,4 +1,4 @@
-package de.andreasgiemza.ubicomproject.services;
+package de.andreasgiemza.ubicomproject.location;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

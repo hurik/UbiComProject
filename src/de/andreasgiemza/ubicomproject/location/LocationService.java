@@ -1,4 +1,4 @@
-package de.andreasgiemza.ubicomproject.services;
+package de.andreasgiemza.ubicomproject.location;
 
 import android.app.Service;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import de.andreasgiemza.ubicomproject.dataserver.DataServer;
+import de.andreasgiemza.ubicomproject.gcm.GcmServer;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
@@ -135,6 +135,6 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		DataServer.INSTANCE.updatePosition(getApplicationContext(), location);
+		GcmServer.INSTANCE.updatePosition(getApplicationContext(), location);
 	}
 }

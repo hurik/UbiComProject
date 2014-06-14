@@ -1,11 +1,6 @@
 package de.andreasgiemza.ubicomproject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,7 +14,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import de.andreasgiemza.ubicomproject.dataserver.JSONParser;
+import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class RegisterActivity extends Activity {
 
@@ -93,15 +89,9 @@ public class RegisterActivity extends Activity {
 					prefs.setAppVersion(prefs.getCurrentAppVersion());
 
 					// Register device with own server
-					List<NameValuePair> getPrarams = new ArrayList<NameValuePair>();
-					getPrarams.add(new BasicNameValuePair("number", prefs
-							.getNumber()));
-					getPrarams.add(new BasicNameValuePair("gcm", regId));
+					GcmServer.INSTANCE.register(getApplicationContext(), regId);
 
-					new JSONParser()
-							.makeHttpRequest("http://ucp.g8j.de/register.php",
-									"GET", getPrarams);
-
+					// All finished start main activity
 					startActivity(new Intent(getApplicationContext(),
 							MainActivity.class));
 					finish();

@@ -15,7 +15,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmIntentService;
-import de.andreasgiemza.ubicomproject.services.LocationService;
+import de.andreasgiemza.ubicomproject.helpers.Preferences;
+import de.andreasgiemza.ubicomproject.location.LocationService;
 
 public class MainActivity extends Activity {
 

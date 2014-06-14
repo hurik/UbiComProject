@@ -27,7 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dip"
         android:layout_marginBottom="20dip"
-        android:hint="@string/register_number_example" />
+        android:hint="@string/register_number_example"
+        android:inputType="phone" />
 
     <Button
         android:id="@+id/register_button"

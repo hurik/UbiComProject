@@ -72,10 +72,10 @@
             android:label="@string/register" >
         </activity>
 
-        <service android:name="de.andreasgiemza.ubicomproject.services.LocationService" />
+        <service android:name="de.andreasgiemza.ubicomproject.location.LocationService" />
         <service android:name="de.andreasgiemza.ubicomproject.gcm.GcmIntentService" />
 
-        <receiver android:name="de.andreasgiemza.ubicomproject.services.BootBroadcastReceiver" >
+        <receiver android:name="de.andreasgiemza.ubicomproject.location.BootBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

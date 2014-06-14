@@ -1,10 +1,11 @@
-package de.andreasgiemza.ubicomproject;
+package de.andreasgiemza.ubicomproject.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
+import de.andreasgiemza.ubicomproject.MainActivity;
 
 public class Preferences {
 
