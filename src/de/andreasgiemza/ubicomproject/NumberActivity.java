@@ -62,12 +62,12 @@ public class NumberActivity extends Activity {
 //			aNumberFromContacts[i] = contactNumber;		
 //			i++;
 //		}
-		
-		for(int j = 0; j < i; j++) {
-			Log.d(aNameFromContacts[i], aNumberFromContacts[i]);
-		}
-		
-		contacts.close();
+//		
+//		for(int j = 0; j < i; j++) {
+//			Log.d(aNameFromContacts[i], aNumberFromContacts[i]);
+//		}
+//		
+//		contacts.close();
 		
 		ListView mListView = (ListView) findViewById(R.id.list_number);
 		if(mListView == null)
