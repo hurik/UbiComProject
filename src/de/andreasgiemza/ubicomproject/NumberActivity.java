@@ -48,7 +48,7 @@ public class NumberActivity extends Activity {
 //		Cursor contacts = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 //		String aNameFromContacts[] = new String[contacts.getCount()];
 //		String aNumberFromContacts[] = new String[contacts.getCount()];
-//		int i = 0;
+		int i = 0;
 //		
 //		int nameFieldColumnIndex = contacts.getColumnIndex(PhoneLookup.DISPLAY_NAME);
 //		int numberFieldColumnIndex = contacts.getColumnIndex(PhoneLookup.NUMBER);
