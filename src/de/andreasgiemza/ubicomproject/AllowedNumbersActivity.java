@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,7 +18,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class NumberActivity extends Activity {
+public class AllowedNumbersActivity extends Activity {
 
 	String[] countries = new String[] { "India", "Pakistan", "Sri Lanka",
 			"China", "Bangladesh", "Nepal", "Afghanistan", "North Korea",
@@ -33,7 +32,7 @@ public class NumberActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_number);
+		setContentView(R.layout.activity_allowed_numbers);
 
 		if (savedInstanceState != null) {
 			status = savedInstanceState.getBooleanArray("status");
@@ -50,8 +49,7 @@ public class NumberActivity extends Activity {
 				null, null);
 		String aNameFromContacts[] = new String[contacts.getCount() + 1];
 		String aNumberFromContacts[] = new String[contacts.getCount() + 1];
-		
-		
+
 		Log.d("Lenght getCount", String.valueOf(contacts.getCount()));
 		int i = 0;
 
@@ -101,7 +99,8 @@ public class NumberActivity extends Activity {
 		String[] from = { "txt", "numb", "stat" };
 
 		// Ids of views in listview_layout
-		int[] to = { R.id.togglelist_name, R.id.togglelist_number, R.id.togglelist_status };
+		int[] to = { R.id.togglelist_name, R.id.togglelist_number,
+				R.id.togglelist_status };
 
 		// Instantiating an adapter to store each items
 		// R.layout.listview_layout defines the layout of each item

@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -30,8 +33,9 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = new Preferences(getApplicationContext());
 
-//		startActivity(new Intent(getApplicationContext(), NumberActivity.class));
-		
+		// startActivity(new Intent(getApplicationContext(),
+		// NumberActivity.class));
+
 		if (!preferences.isRegistered()) {
 			startActivity(new Intent(getApplicationContext(),
 					RegisterActivity.class));
@@ -89,6 +93,26 @@ public class MainActivity extends Activity {
 				googleMap.addMarker(markerOptions);
 			}
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.number:
+			startActivity(new Intent(getApplicationContext(),
+					AllowedNumbersActivity.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
 	}
 
 	@Override

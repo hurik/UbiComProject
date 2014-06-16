@@ -6,7 +6,6 @@
     <string name="register_number">Number</string>
     <string name="register_number_summary">Please insert your phone number, if the field is empty.</string>
     <string name="register_number_example">+49XXXXXXXXXXX</string>
-
-    <string name="number">Number</string>
+    <string name="allowed_numbers">Allowed numbers</string>
     
 </resources>

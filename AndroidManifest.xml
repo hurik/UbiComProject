@@ -75,8 +75,8 @@
             android:label="@string/register" >
         </activity>
         <activity
-            android:name="de.andreasgiemza.ubicomproject.NumberActivity"
-            android:label="@string/number" >
+            android:name="de.andreasgiemza.ubicomproject.AllowedNumbersActivity"
+            android:label="@string/allowed_numbers" >
         </activity>
 
         <service android:name="de.andreasgiemza.ubicomproject.location.LocationService" />
