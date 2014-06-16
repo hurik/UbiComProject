@@ -11,8 +11,10 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,10 +68,17 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+
+		timerHandler.removeCallbacks(timerRunnable);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 
-		drawFriends();
+		timerHandler.postDelayed(timerRunnable, 0);
 	}
 
 	private void drawFriends() {
@@ -159,4 +168,18 @@ public class MainActivity extends Activity {
 
 		return contactName;
 	}
+
+	Handler timerHandler = new Handler();
+	Runnable timerRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			drawFriends();
+
+			Log.d("MainActivity", (int)(System.currentTimeMillis() - new Long(1402960637265)) + "");
+
+			timerHandler.postDelayed(this, 15 * 1000);
+		}
+	};
+
 }
