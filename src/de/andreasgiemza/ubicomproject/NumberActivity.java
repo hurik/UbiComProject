@@ -7,7 +7,6 @@ import java.util.List;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
@@ -24,7 +23,8 @@ public class NumberActivity extends Activity {
 
 	String[] countries = new String[] { "India", "Pakistan", "Sri Lanka",
 			"China", "Bangladesh", "Nepal", "Afghanistan", "North Korea",
-			"South Korea", "Japan", "Deutschland", "Halo", "Hallo", "hallohallo" };
+			"South Korea", "Japan", "Deutschland", "Halo", "Hallo",
+			"hallohallo" };
 
 	// Array of booleans to store toggle button status
 	public boolean[] status = { true, false, false, false, false, false, false,
@@ -45,51 +45,63 @@ public class NumberActivity extends Activity {
 
 		super.onStart();
 
-//		Cursor contacts = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-//		String aNameFromContacts[] = new String[contacts.getCount()];
-//		String aNumberFromContacts[] = new String[contacts.getCount()];
+		Cursor contacts = getContentResolver().query(
+				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+				null, null);
+		String aNameFromContacts[] = new String[contacts.getCount() + 1];
+		String aNumberFromContacts[] = new String[contacts.getCount() + 1];
+		
+		
+		Log.d("Lenght getCount", String.valueOf(contacts.getCount()));
 		int i = 0;
-//		
-//		int nameFieldColumnIndex = contacts.getColumnIndex(PhoneLookup.DISPLAY_NAME);
-//		int numberFieldColumnIndex = contacts.getColumnIndex(PhoneLookup.NUMBER);
-//		
-//		while(contacts.moveToNext()) {
-//			
-//			String contactName = contacts.getString(nameFieldColumnIndex);
-//			aNameFromContacts[i] = contactName;
-//			
-//			String contactNumber = contacts.getString(numberFieldColumnIndex);
-//			aNumberFromContacts[i] = contactNumber;		
-//			i++;
-//		}
-//		
-//		for(int j = 0; j < i; j++) {
-//			Log.d(aNameFromContacts[i], aNumberFromContacts[i]);
-//		}
-//		
-//		contacts.close();
-		
+
+		// int nameFieldColumnIndex =
+		// contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+		// int numberFieldColumnIndex =
+		// contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+		while (contacts.moveToNext()) {
+
+			String contactName = contacts
+					.getString(contacts
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			aNameFromContacts[i] = contactName;
+
+			String contactNumber = contacts
+					.getString(contacts
+							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			aNumberFromContacts[i] = contactNumber;
+			i++;
+		}
+
+		for (int j = 0; j < i; j++) {
+			Log.d(aNameFromContacts[j], aNumberFromContacts[j]);
+		}
+
+		contacts.close();
+
 		ListView mListView = (ListView) findViewById(R.id.list_number);
-		if(mListView == null)
+		if (mListView == null)
 			Log.e("tag", "ListView is null");
-		
+
 		mListView.setOnItemClickListener(itemClickListener);
 
 		// Each row in the list stores country name and its status
 		List<HashMap<String, Object>> aList = new ArrayList<HashMap<String, Object>>();
 
-		for (i = 0; i < countries.length; i++) {
+		for (i = 0; i < aNameFromContacts.length; i++) {
 			HashMap<String, Object> hm = new HashMap<String, Object>();
-			hm.put("txt", countries[i]);
-			hm.put("stat", status[i]);
+			hm.put("txt", aNameFromContacts[i]);
+			hm.put("numb", aNumberFromContacts[i]);
+			hm.put("stat", false);
 			aList.add(hm);
 		}
 
 		// Keys used in Hashmap
-		String[] from = { "txt", "stat" };
+		String[] from = { "txt", "numb", "stat" };
 
 		// Ids of views in listview_layout
-		int[] to = { R.id.togglelist_name, R.id.togglelist_status };
+		int[] to = { R.id.togglelist_name, R.id.togglelist_number, R.id.togglelist_status };
 
 		// Instantiating an adapter to store each items
 		// R.layout.listview_layout defines the layout of each item
