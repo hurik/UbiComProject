@@ -4,9 +4,14 @@ import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,9 +37,6 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = new Preferences(getApplicationContext());
-
-		// startActivity(new Intent(getApplicationContext(),
-		// NumberActivity.class));
 
 		if (!preferences.isRegistered()) {
 			startActivity(new Intent(getApplicationContext(),
@@ -78,14 +80,19 @@ public class MainActivity extends Activity {
 		for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
 				.entrySet()) {
 
-			int elapsedSeconds = (int) ((System.currentTimeMillis() - entry
-					.getValue().time) / 1000);
+			int elapsedMinutes = (int) ((System.currentTimeMillis() - entry
+					.getValue().time) / 1000 / 60);
 
-			if (elapsedSeconds < 60 * 60) {
+			String markerText = getContactName(getApplicationContext(),
+					entry.getKey())
+					+ "\n"
+					+ (elapsedMinutes < 1 ? "< 1" : elapsedMinutes)
+					+ " " + getResources().getString(R.string.main_minutes_ago);
+
+			if (elapsedMinutes < 20) {
 				MarkerOptions markerOptions = new MarkerOptions()
 						.icon(BitmapDescriptorFactory.fromBitmap(iconFactory
-								.makeIcon(entry.getKey() + "\n"
-										+ elapsedSeconds + " seconds ago")))
+								.makeIcon(markerText)))
 						.position(entry.getValue().latLng)
 						.anchor(iconFactory.getAnchorU(),
 								iconFactory.getAnchorV());
@@ -130,4 +137,26 @@ public class MainActivity extends Activity {
 			drawFriends();
 		};
 	};
+
+	public static String getContactName(Context context, String phoneNumber) {
+		ContentResolver cr = context.getContentResolver();
+		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
+				Uri.encode(phoneNumber));
+		Cursor cursor = cr.query(uri,
+				new String[] { PhoneLookup.DISPLAY_NAME }, null, null, null);
+		if (cursor == null) {
+			return phoneNumber;
+		}
+		String contactName = phoneNumber;
+		if (cursor.moveToFirst()) {
+			contactName = cursor.getString(cursor
+					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
+		}
+
+		if (cursor != null && !cursor.isClosed()) {
+			cursor.close();
+		}
+
+		return contactName;
+	}
 }
