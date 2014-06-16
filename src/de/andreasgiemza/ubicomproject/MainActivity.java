@@ -176,8 +176,6 @@ public class MainActivity extends Activity {
 		public void run() {
 			drawFriends();
 
-			Log.d("MainActivity", (int)(System.currentTimeMillis() - new Long(1402960637265)) + "");
-
 			timerHandler.postDelayed(this, 15 * 1000);
 		}
 	};
