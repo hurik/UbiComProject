@@ -8,10 +8,15 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
+    <!-- permission for internet -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+
     <!-- permission for reading telephone-number -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!-- permission for reading contacts -->
+    <!-- permission for reading telephone contacts -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- permission for googl cloud messaging -->
@@ -28,13 +33,7 @@
     <!-- permission for boot completed -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- permission for reading telephone contacts -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    
-    <!-- Copied from Google Maps Library/AndroidManifest.xml. -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- permission for google maps -->
     <!-- External storage for caching. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- My Location -->
@@ -44,7 +43,6 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <!-- End of copy. -->
 
     <application
         android:allowBackup="true"
@@ -52,14 +50,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!-- Copied from Google Maps Library/AndroidManifest.xml. -->
+        <!-- permission for google maps -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDrzwAM7TCvxKJ8s8hfPYDGiHO_3eHzzqY" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <!-- End of copy. -->
 
         <activity
             android:name="de.andreasgiemza.ubicomproject.MainActivity"
@@ -79,14 +76,14 @@
             android:label="@string/allowed_numbers" >
         </activity>
 
-        <service android:name="de.andreasgiemza.ubicomproject.location.LocationService" />
-        <service android:name="de.andreasgiemza.ubicomproject.gcm.GcmIntentService" />
-
         <receiver android:name="de.andreasgiemza.ubicomproject.location.BootBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <service android:name="de.andreasgiemza.ubicomproject.location.LocationService" />
+
         <receiver
             android:name="de.andreasgiemza.ubicomproject.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -97,6 +94,8 @@
                 <category android:name="de.andreasgiemza.ubicomproject" />
             </intent-filter>
         </receiver>
+
+        <service android:name="de.andreasgiemza.ubicomproject.gcm.GcmIntentService" />
     </application>
 
 </manifest>
