@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
 
 public class LocationService extends Service implements
 		GooglePlayServicesClient.ConnectionCallbacks,
@@ -136,5 +137,6 @@ public class LocationService extends Service implements
 	@Override
 	public void onLocationChanged(Location location) {
 		GcmServer.INSTANCE.updatePosition(getApplicationContext(), location);
+		PositionsStorage.INSTANCE.updateMyPosition(location);
 	}
 }
