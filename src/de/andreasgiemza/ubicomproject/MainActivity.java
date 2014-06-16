@@ -30,6 +30,8 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		preferences = new Preferences(getApplicationContext());
 
+//		startActivity(new Intent(getApplicationContext(), NumberActivity.class));
+		
 		if (!preferences.isRegistered()) {
 			startActivity(new Intent(getApplicationContext(),
 					RegisterActivity.class));

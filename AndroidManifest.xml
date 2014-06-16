@@ -28,6 +28,9 @@
     <!-- permission for boot completed -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- permission for reading telephone contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    
     <!-- Copied from Google Maps Library/AndroidManifest.xml. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -70,6 +73,10 @@
         <activity
             android:name="de.andreasgiemza.ubicomproject.RegisterActivity"
             android:label="@string/register" >
+        </activity>
+        <activity
+            android:name="de.andreasgiemza.ubicomproject.NumberActivity"
+            android:label="@string/number" >
         </activity>
 
         <service android:name="de.andreasgiemza.ubicomproject.location.LocationService" />
