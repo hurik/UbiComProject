@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
 				.registerReceiver(mMessageReceiver,
 						new IntentFilter(GcmIntentService.BROADCAST_ACTION));
 
-		drawFriends();
+		timerHandler.postDelayed(timerRunnable, 0);
 	}
 
 	@Override
@@ -91,13 +91,16 @@ public class MainActivity extends Activity {
 			int elapsedMinutes = (int) ((System.currentTimeMillis() - entry
 					.getValue().time) / 1000 / 60);
 
-			String markerText = getContactName(getApplicationContext(),
-					entry.getKey())
-					+ "\n"
-					+ (elapsedMinutes < 1 ? "< 1" : elapsedMinutes)
-					+ " " + getResources().getString(R.string.main_minutes_ago);
-
 			if (elapsedMinutes < 20) {
+				String markerText = getContactName(getApplicationContext(),
+						entry.getKey())
+						+ "\n"
+						+ (elapsedMinutes < 1 ? "< 1" : elapsedMinutes)
+						+ " "
+						+ (elapsedMinutes < 2 ? getResources().getString(
+								R.string.main_minute_ago) : getResources()
+								.getString(R.string.main_minutes_ago));
+
 				MarkerOptions markerOptions = new MarkerOptions()
 						.icon(BitmapDescriptorFactory.fromBitmap(iconFactory
 								.makeIcon(markerText)))

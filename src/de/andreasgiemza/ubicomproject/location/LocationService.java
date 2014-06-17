@@ -139,7 +139,7 @@ public class LocationService extends Service implements
 	public void onLocationChanged(Location location) {
 		final Preferences prefs = new Preferences(getApplicationContext());
 
-		if (!prefs.isRegistered()) {
+		if (prefs.isRegistered()) {
 			GcmServer.INSTANCE
 					.updatePosition(getApplicationContext(), location);
 			PositionsStorage.INSTANCE.updateMyPosition(location);
