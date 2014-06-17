@@ -1,9 +1,11 @@
 package de.andreasgiemza.ubicomproject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import de.andreasgiemza.ubicomproject.gcm.GcmServer;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -79,11 +81,9 @@ public class AllowedNumbersActivity extends Activity {
 			i++;
 		}
 
-		for (int j = 0; j < i; j++) {
-			Log.d(aNameFromContacts[j], aNumberFromContacts[j]);
-		}
-
 		contacts.close();
+
+		GcmServer.INSTANCE.getKnownNumbers(Arrays.asList(aNumberFromContacts));
 
 		ListView mListView = (ListView) findViewById(R.id.list_number);
 		if (mListView == null)
@@ -118,12 +118,11 @@ public class AllowedNumbersActivity extends Activity {
 	}
 
 	private String parseNumber(String string) {
-		
-		if(string.charAt(0) == '+') {
+		if (string.charAt(0) == '+') {
 			return string;
 		}
 		string = string.replaceFirst("0", "+49");
-		
+
 		return string;
 	}
 
@@ -136,7 +135,8 @@ public class AllowedNumbersActivity extends Activity {
 
 			SimpleAdapter adapter = (SimpleAdapter) listView.getAdapter();
 
-			HashMap<String, Object> hm = (HashMap) adapter.getItem(position);
+			HashMap<String, Object> hm = (HashMap<String, Object>) adapter
+					.getItem(position);
 
 			/** The clicked Item in the ListView */
 			RelativeLayout rLayout = (RelativeLayout) item;
@@ -159,5 +159,4 @@ public class AllowedNumbersActivity extends Activity {
 					Toast.LENGTH_SHORT).show();
 		}
 	};
-
 }
