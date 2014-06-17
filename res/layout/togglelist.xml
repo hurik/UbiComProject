@@ -20,8 +20,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/togglelist_name"
         android:paddingBottom="5dp"
-        android:paddingLeft="5dp"
-        android:text="+491715471692" />
+        android:paddingLeft="5dp" />
 
     <ToggleButton
         android:id="@+id/togglelist_status"

@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,9 +45,15 @@ public class AllowedNumbersActivity extends Activity {
 
 		super.onStart();
 
-		Cursor contacts = getContentResolver().query(
-				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
-				null, null);
+		String projection[] = null;
+		String selection = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = '"
+				+ ("1") + "'" + " AND "
+				+ ContactsContract.Contacts.HAS_PHONE_NUMBER;
+		String selectionArgs[] = null;
+		String sortOrder = Phone.DISPLAY_NAME + " ASC";
+
+		Cursor contacts = getContentResolver().query(Phone.CONTENT_URI,
+				projection, selection, selectionArgs, sortOrder);
 		String aNameFromContacts[] = new String[contacts.getCount() + 1];
 		String aNumberFromContacts[] = new String[contacts.getCount() + 1];
 
@@ -68,7 +75,7 @@ public class AllowedNumbersActivity extends Activity {
 			String contactNumber = contacts
 					.getString(contacts
 							.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-			aNumberFromContacts[i] = contactNumber;
+			aNumberFromContacts[i] = parseNumber(contactNumber);
 			i++;
 		}
 
@@ -108,6 +115,16 @@ public class AllowedNumbersActivity extends Activity {
 				R.layout.togglelist, from, to);
 
 		mListView.setAdapter(adapter);
+	}
+
+	private String parseNumber(String string) {
+		
+		if(string.charAt(0) == '+') {
+			return string;
+		}
+		string = string.replaceFirst("0", "+49");
+		
+		return string;
 	}
 
 	private OnItemClickListener itemClickListener = new OnItemClickListener() {
