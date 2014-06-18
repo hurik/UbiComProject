@@ -67,57 +67,49 @@ public enum GcmServer {
 		}
 	}
 
-	public void getKnownNumbers(final List<String> numbers) {
-		new Thread(new Runnable() {
+	public List<String> getKnownNumbers(final List<String> numbers) {
+		String numbersString = "";
 
-			@Override
-			public void run() {
-				String numbersString = "";
+		for (String number : numbers) {
+			if (number != null)
+				numbersString += number.replaceAll("\\s", "") + ";";
+		}
 
-				for (String number : numbers) {
-					if (number != null)
-						numbersString += number.replaceAll("\\s", "") + ";";
-				}
+		List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+		postParams.add(new BasicNameValuePair("numbers", numbersString));
 
-				List<NameValuePair> postParams = new ArrayList<NameValuePair>();
-				postParams
-						.add(new BasicNameValuePair("numbers", numbersString));
+		JSONObject answer = makeHttpRequest(
+				"http://ucp.g8j.de/known_numbers.php", "GET", postParams);
 
-				JSONObject answer = makeHttpRequest(
-						"http://ucp.g8j.de/known_numbers.php", "GET",
-						postParams);
+		List<String> knownNumbers = new LinkedList<>();
 
-				List<String> knownNumbers = new LinkedList<>();
+		try {
+			if (answer != null) {
+				// Checking for SUCCESS TAG
+				int success = answer.getInt("success");
 
-				try {
-					if (answer != null) {
-						// Checking for SUCCESS TAG
-						int success = answer.getInt("success");
+				if (success == 1) {
+					// Getting Array of Products
+					JSONArray jsonKnownNumbers = answer
+							.getJSONArray("knownNumbers");
 
-						if (success == 1) {
-							// Getting Array of Products
-							JSONArray jsonKnownNumbers = answer
-									.getJSONArray("knownNumbers");
+					// looping through All Products
+					for (int i = 0; i < jsonKnownNumbers.length(); i++) {
+						JSONObject c = jsonKnownNumbers.getJSONObject(i);
 
-							// looping through All Products
-							for (int i = 0; i < jsonKnownNumbers.length(); i++) {
-								JSONObject c = jsonKnownNumbers
-										.getJSONObject(i);
-
-								knownNumbers.add(c.getString("number"));
-							}
-						}
+						knownNumbers.add(c.getString("number"));
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				for (String number : knownNumbers) {
-					Log.d("AllowedNumbers", number);
 				}
 			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
-		}).start();
+		for (String number : knownNumbers) {
+			Log.d("AllowedNumbers", number);
+		}
+		return knownNumbers;
+
 	}
 
 	// function get json from url
