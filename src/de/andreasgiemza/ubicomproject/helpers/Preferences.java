@@ -1,5 +1,9 @@
 package de.andreasgiemza.ubicomproject.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.R.string;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -12,6 +16,7 @@ public class Preferences {
 	private static final String NUMBER = "number";
 	private static final String REG_ID = "regId";
 	private static final String APP_VERSION = "appVersion";
+	private static final String ALLOWED ="allowed";
 
 	private final Context context;
 	private final SharedPreferences prefs;
@@ -42,6 +47,34 @@ public class Preferences {
 		editor.commit();
 	}
 
+	public void setAllowedNumbers(List<String> numbers) {
+		
+		String allowed = "";
+		
+		for(int i  = 0; i < numbers.size() - 1; i++) {
+			allowed +=  numbers.get(i) + ";";
+		}
+		allowed += numbers.get(numbers.size() - 1);
+		
+		editor.putString(ALLOWED, allowed);
+		editor.commit();		
+	}
+	
+	public List<String> getAllowedNumbers() {
+		
+		List<String> result = new ArrayList<>();
+		String numbers = prefs.getString(ALLOWED, "");
+		
+		if(numbers.equals(""))
+			return null;
+		
+		String numberList[] = numbers.split(";");
+		for(String number : numberList) {
+			result.add(number);
+		}	
+		return result;
+	}
+	
 	public int getAppVersion() {
 		return prefs.getInt(APP_VERSION, Integer.MIN_VALUE);
 	}

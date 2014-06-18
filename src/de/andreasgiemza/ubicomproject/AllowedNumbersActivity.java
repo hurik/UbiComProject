@@ -1,20 +1,16 @@
 package de.andreasgiemza.ubicomproject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import de.andreasgiemza.ubicomproject.gcm.GcmServer;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,19 +20,13 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class AllowedNumbersActivity extends Activity {
 
 	ListView mListView = null;
-
-	String[] countries = new String[] { "India", "Pakistan", "Sri Lanka",
-			"China", "Bangladesh", "Nepal", "Afghanistan", "North Korea",
-			"South Korea", "Japan", "Deutschland", "Halo", "Hallo",
-			"hallohallo" };
-
-	// Array of booleans to store toggle button status
-	public boolean[] status = { true, false, false, false, false, false, false,
-			false, false, false, false, false, false, false, false };
+	SimpleAdapter adapter = null;
 
 	// A ProgressDialog object
 	private ProgressDialog progressDialog;
@@ -44,10 +34,9 @@ public class AllowedNumbersActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_allowed_numbers);
 
 		if (savedInstanceState != null) {
-			status = savedInstanceState.getBooleanArray("status");
+			// status = savedInstanceState.getBooleanArray("status");
 		}
 
 		new LoadViewTask().execute();
@@ -58,21 +47,15 @@ public class AllowedNumbersActivity extends Activity {
 
 		super.onStart();
 
-		mListView = (ListView) findViewById(R.id.list_number);
-		if (mListView == null)
-			Log.e("tag", "ListView is null");
-
-		mListView.setOnItemClickListener(itemClickListener);
 	}
-	
+
 	@Override
 	protected void onStop() {
-		
-		//TODO save all allowed Number in Preferences
-		
+
+		// TODO save all allowed Number in Preferences
+
 		super.onStop();
-		
-		
+
 	}
 
 	private String parseNumber(String string) {
@@ -106,11 +89,11 @@ public class AllowedNumbersActivity extends Activity {
 			if (tgl.isChecked()) {
 				tgl.setChecked(false);
 				strStatus = "Off";
-				status[position] = false;
+				// status[position] = false;
 			} else {
 				tgl.setChecked(true);
 				strStatus = "On";
-				status[position] = true;
+				// status[position] = true;
 			}
 			Toast.makeText(getBaseContext(),
 					(String) hm.get("txt") + " : " + strStatus,
@@ -150,54 +133,57 @@ public class AllowedNumbersActivity extends Activity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			// Get the current thread's token
-//			synchronized (this) {
-				
-				//TODO check if connected to Internet
-			
-				// Get all Numbers from Telephone-Book
-				List<String> allNumbers = new ArrayList<>();
-				
-				String projection[] = { Phone.NUMBER };
-				String selection = ContactsContract.Contacts.IN_VISIBLE_GROUP
-						+ " = '" + ("1") + "'" + " AND "
-						+ ContactsContract.Contacts.HAS_PHONE_NUMBER;
-				String selectionArgs[] = null;
-				String sortOrder = Phone.DISPLAY_NAME + " ASC";
+			// synchronized (this) {
 
-				Cursor contacts = getContentResolver().query(Phone.CONTENT_URI,
-						projection, selection, selectionArgs, sortOrder);
+			// TODO check if connected to Internet
 
-				// Save all Numbers in a List
-				while (contacts.moveToNext()) {
+			// Get all Numbers from Telephone-Book
+			List<String> allNumbers = new ArrayList<>();
 
-					String contactNumber = contacts
-							.getString(contacts
-									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-					allNumbers.add(parseNumber(contactNumber));
-				}
-				
-				contacts.close();
+			String projection[] = { Phone.NUMBER };
+			String selection = ContactsContract.Contacts.IN_VISIBLE_GROUP
+					+ " = '" + ("1") + "'" + " AND "
+					+ ContactsContract.Contacts.HAS_PHONE_NUMBER;
+			String selectionArgs[] = null;
+			String sortOrder = Phone.DISPLAY_NAME + " ASC";
 
-				// Get registered Numbers
-				List<String> registeredNumbers;
-				registeredNumbers = GcmServer.INSTANCE.getKnownNumbers(allNumbers);
-				
-				// Get allowedNumbers
-				List<String> allowedNumbers;
-				
-				// Each row in the list stores country name and its status
-				aList = new ArrayList<HashMap<String, Object>>();
-			
-				
-//				for (String number : knownNumbers) {
-//					HashMap<String, Object> hm = new HashMap<String, Object>();
-//					hm.put("txt", MainActivity.getContactName(getApplicationContext(), number));
-//					hm.put("numb", number);
-//					hm.put("stat", false);
-//					aList.add(hm);
-//				}
+			Cursor contacts = getContentResolver().query(Phone.CONTENT_URI,
+					projection, selection, selectionArgs, sortOrder);
 
-//			}
+			// Save all Numbers in a List
+			while (contacts.moveToNext()) {
+
+				String contactNumber = contacts
+						.getString(contacts
+								.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+				allNumbers.add(parseNumber(contactNumber));
+			}
+
+			contacts.close();
+
+			// Get registered Numbers
+			List<String> registeredNumbers;
+			registeredNumbers = GcmServer.INSTANCE.getKnownNumbers(allNumbers);
+
+			Preferences pref = new Preferences(getApplicationContext());
+			// pref.setAllowedNumbers(registeredNumbers);
+
+			// Get allowedNumbers
+			List<String> allowedNumbers = pref.getAllowedNumbers();
+
+			// Each row in the list stores country name and its status
+			aList = new ArrayList<HashMap<String, Object>>();
+
+			for (String number : registeredNumbers) {
+				HashMap<String, Object> hm = new HashMap<String, Object>();
+				hm.put("txt", MainActivity.getContactName(
+						getApplicationContext(), number));
+				hm.put("numb", number);
+				hm.put("stat", allowedNumbers.contains(number) ? true : false);
+				aList.add(hm);
+			}
+
+			// }
 			return null;
 		}
 
@@ -225,8 +211,12 @@ public class AllowedNumbersActivity extends Activity {
 
 			// Instantiating an adapter to store each items
 			// R.layout.listview_layout defines the layout of each item
-			SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), aList,
+			adapter = new SimpleAdapter(getBaseContext(), aList,
 					R.layout.togglelist, from, to);
+
+			mListView = (ListView) findViewById(R.id.list_number);
+
+			mListView.setOnItemClickListener(itemClickListener);
 
 			// TODO check if null
 			mListView.setAdapter(adapter);
