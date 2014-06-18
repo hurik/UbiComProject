@@ -3,6 +3,7 @@ package de.andreasgiemza.ubicomproject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TooManyListenersException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -13,11 +14,13 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import de.andreasgiemza.ubicomproject.gcm.GcmServer;
@@ -53,7 +56,30 @@ public class AllowedNumbersActivity extends Activity {
 	protected void onStop() {
 
 		// TODO save all allowed Number in Preferences
-
+		List<String> allowed = new ArrayList<>();
+		Adapter adapter =  mListView.getAdapter();
+		
+		
+		for(int i  = 0; i < adapter.getCount(); i++) {
+			Log.d("COUNT", String.valueOf(adapter.getCount()));
+			RelativeLayout listItem = (RelativeLayout) adapter.getView(i, mListView.getChildAt(i), mListView);
+			
+			Log.d("Layout", listItem.toString());
+			ToggleButton tgl = (ToggleButton) listItem.getChildAt(2);
+			
+			Log.d("Toggle", tgl.toString());
+			Log.d("IsChecked", String.valueOf(tgl.isChecked()));
+			
+			// TODO <- ist immer true?
+			if(tgl.isChecked()) {
+				TextView text = (TextView) listItem.getChildAt(1);
+				String number = (String) text.getText();
+				Log.e("TEXT", number);
+			} else {
+				Log.e("TEXT", "false");
+			}
+		}
+		
 		super.onStop();
 
 	}
@@ -164,7 +190,7 @@ public class AllowedNumbersActivity extends Activity {
 			// Get registered Numbers
 			List<String> registeredNumbers;
 			registeredNumbers = GcmServer.INSTANCE.getKnownNumbers(allNumbers);
-
+			
 			Preferences pref = new Preferences(getApplicationContext());
 			// pref.setAllowedNumbers(registeredNumbers);
 
@@ -216,7 +242,7 @@ public class AllowedNumbersActivity extends Activity {
 
 			mListView = (ListView) findViewById(R.id.list_number);
 
-			mListView.setOnItemClickListener(itemClickListener);
+//			mListView.setOnItemClickListener(itemClickListener);
 
 			// TODO check if null
 			mListView.setAdapter(adapter);
