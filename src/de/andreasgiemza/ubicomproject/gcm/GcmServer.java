@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -18,6 +19,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,6 +65,59 @@ public enum GcmServer {
 				}
 			}).start();
 		}
+	}
+
+	public void getKnownNumbers(final List<String> numbers) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				String numbersString = "";
+
+				for (String number : numbers) {
+					if (number != null)
+						numbersString += number.replaceAll("\\s", "") + ";";
+				}
+
+				List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+				postParams
+						.add(new BasicNameValuePair("numbers", numbersString));
+
+				JSONObject answer = makeHttpRequest(
+						"http://ucp.g8j.de/known_numbers.php", "GET",
+						postParams);
+
+				List<String> knownNumbers = new LinkedList<>();
+
+				try {
+					if (answer != null) {
+						// Checking for SUCCESS TAG
+						int success = answer.getInt("success");
+
+						if (success == 1) {
+							// Getting Array of Products
+							JSONArray jsonKnownNumbers = answer
+									.getJSONArray("knownNumbers");
+
+							// looping through All Products
+							for (int i = 0; i < jsonKnownNumbers.length(); i++) {
+								JSONObject c = jsonKnownNumbers
+										.getJSONObject(i);
+
+								knownNumbers.add(c.getString("number"));
+							}
+						}
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+				for (String number : knownNumbers) {
+					Log.d("AllowedNumbers", number);
+				}
+			}
+
+		}).start();
 	}
 
 	// function get json from url
