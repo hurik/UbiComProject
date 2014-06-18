@@ -57,29 +57,33 @@ public class AllowedNumbersActivity extends Activity {
 
 		// TODO save all allowed Number in Preferences
 		List<String> allowed = new ArrayList<>();
-		Adapter adapter =  mListView.getAdapter();
-		
-		
-		for(int i  = 0; i < adapter.getCount(); i++) {
-			Log.d("COUNT", String.valueOf(adapter.getCount()));
-			RelativeLayout listItem = (RelativeLayout) adapter.getView(i, mListView.getChildAt(i), mListView);
-			
-			Log.d("Layout", listItem.toString());
+		Adapter adapter = mListView.getAdapter();
+
+		for (int i = 0; i < adapter.getCount(); i++) {
+			Log.d("COUNT", String.valueOf(adapter.getCount()));// DEBUG
+
+			// Get listitem "togglelist.xml"
+			RelativeLayout listItem = (RelativeLayout) adapter.getView(i,
+					mListView.getChildAt(i), mListView);
+
+			Log.d("Layout", listItem.toString()); // DEBUG
+
+			// Child number 2 from item is toggleButton
 			ToggleButton tgl = (ToggleButton) listItem.getChildAt(2);
-			
-			Log.d("Toggle", tgl.toString());
-			Log.d("IsChecked", String.valueOf(tgl.isChecked()));
-			
+
+			Log.d("Toggle", tgl.toString());// DEBUG
+			Log.d("IsChecked", String.valueOf(tgl.isChecked()));// DEBUG
+
 			// TODO <- ist immer true?
-			if(tgl.isChecked()) {
+			if (tgl.isChecked()) {
 				TextView text = (TextView) listItem.getChildAt(1);
 				String number = (String) text.getText();
-				Log.e("TEXT", number);
+				Log.e("TEXT", number);//DEBUG
 			} else {
-				Log.e("TEXT", "false");
+				Log.e("TEXT", "false");//DEBUG				
 			}
 		}
-		
+
 		super.onStop();
 
 	}
@@ -190,7 +194,7 @@ public class AllowedNumbersActivity extends Activity {
 			// Get registered Numbers
 			List<String> registeredNumbers;
 			registeredNumbers = GcmServer.INSTANCE.getKnownNumbers(allNumbers);
-			
+
 			Preferences pref = new Preferences(getApplicationContext());
 			// pref.setAllowedNumbers(registeredNumbers);
 
@@ -242,7 +246,7 @@ public class AllowedNumbersActivity extends Activity {
 
 			mListView = (ListView) findViewById(R.id.list_number);
 
-//			mListView.setOnItemClickListener(itemClickListener);
+			// mListView.setOnItemClickListener(itemClickListener);
 
 			// TODO check if null
 			mListView.setAdapter(adapter);
