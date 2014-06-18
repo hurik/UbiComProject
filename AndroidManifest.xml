@@ -75,6 +75,10 @@
             android:name="de.andreasgiemza.ubicomproject.AllowedNumbersActivity"
             android:label="@string/allowed_numbers" >
         </activity>
+        <activity
+            android:name="de.andreasgiemza.ubicomproject.WaitingScreen"
+            android:label="@string/waitingscreen" >
+        </activity>
 
         <receiver android:name="de.andreasgiemza.ubicomproject.location.BootBroadcastReceiver" >
             <intent-filter>
