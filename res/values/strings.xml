@@ -10,4 +10,5 @@
     <string name="register_number_example">+49XXXXXXXXXXX</string>
     <string name="allowed_numbers">Allowed numbers</string>
     <string name="loading">Loading &#8230;</string>
+    <string name="notification_title">Person in the vicinity!</string>
 </resources>
