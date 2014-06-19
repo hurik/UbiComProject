@@ -105,9 +105,6 @@ public enum GcmServer {
 			e.printStackTrace();
 		}
 
-		for (String number : knownNumbers) {
-			Log.d("AllowedNumbers", number);
-		}
 		return knownNumbers;
 
 	}
