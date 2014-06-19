@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity {
 
 		for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
 				.entrySet()) {
-
+			
 			int elapsedMinutes = (int) ((System.currentTimeMillis() - entry
 					.getValue().time) / 1000 / 60);
 
