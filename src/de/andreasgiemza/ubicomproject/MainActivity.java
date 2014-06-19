@@ -32,14 +32,14 @@ import de.andreasgiemza.ubicomproject.location.LocationService;
 
 public class MainActivity extends Activity {
 
-	private Preferences preferences;
+	private Preferences prefs;
 	private GoogleMap googleMap;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		preferences = new Preferences(getApplicationContext());
+		prefs = new Preferences(getApplicationContext());
 
-		if (!preferences.isRegistered()) {
+		if (!prefs.isRegistered()) {
 			startActivity(new Intent(getApplicationContext(),
 					RegisterActivity.class));
 			finish();

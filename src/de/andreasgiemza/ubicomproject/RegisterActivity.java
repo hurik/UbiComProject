@@ -3,8 +3,10 @@ package de.andreasgiemza.ubicomproject;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -65,7 +67,7 @@ public class RegisterActivity extends Activity {
 							|| prefs.getAppVersion() != prefs
 									.getCurrentAppVersion()) {
 						// Register the user in background
-						registerInBackground();
+						new RegisterTask().execute();
 					}
 				} else {
 					Toast.makeText(getApplicationContext(),
@@ -76,29 +78,54 @@ public class RegisterActivity extends Activity {
 		});
 	}
 
-	private void registerInBackground() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					// Register device with google cloud messaging
-					gcm = GoogleCloudMessaging.getInstance(context);
-					String regId = gcm.register("470689489809");
+	private class RegisterTask extends AsyncTask<String, String, String> {
 
-					prefs.setRegId(regId);
-					prefs.setAppVersion(prefs.getCurrentAppVersion());
+		ProgressDialog loadingDialog;
 
-					// Register device with own server
-					GcmServer.INSTANCE.register(getApplicationContext(), regId);
+		// Before running code in separate thread
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
 
-					// All finished start main activity
-					startActivity(new Intent(getApplicationContext(),
-							MainActivity.class));
-					finish();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			loadingDialog = new ProgressDialog(RegisterActivity.this);
+			loadingDialog
+					.setMessage(getResources().getString(R.string.loading));
+			loadingDialog.setIndeterminate(false);
+			loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			loadingDialog.setCancelable(false);
+			loadingDialog.show();
+		}
+
+		// The code to be executed in a background thread.
+		@Override
+		protected String doInBackground(String... params) {
+			try {
+				// Register device with google cloud messaging
+				gcm = GoogleCloudMessaging.getInstance(context);
+				String regId = gcm.register("470689489809");
+
+				prefs.setRegId(regId);
+				prefs.setAppVersion(prefs.getCurrentAppVersion());
+
+				// Register device with own server
+				GcmServer.INSTANCE.register(getApplicationContext(), regId);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		}).start();
+
+			return null;
+		}
+
+		// after executing the code in the thread
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			loadingDialog.dismiss();
+
+			// All finished start main activity
+			startActivity(new Intent(getApplicationContext(),
+					MainActivity.class));
+			finish();
+		}
 	}
 }
