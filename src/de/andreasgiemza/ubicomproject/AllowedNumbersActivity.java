@@ -58,7 +58,8 @@ public class AllowedNumbersActivity extends ListActivity {
 			super.onPreExecute();
 
 			loadingDialog = new ProgressDialog(AllowedNumbersActivity.this);
-			loadingDialog.setMessage(getResources().getString(R.string.loading));
+			loadingDialog
+					.setMessage(getResources().getString(R.string.loading));
 			loadingDialog.setIndeterminate(false);
 			loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			loadingDialog.setCancelable(false);
