@@ -10,16 +10,20 @@ import com.google.android.gms.maps.model.LatLng;
 public enum PositionsStorage {
 	INSTANCE;
 
-	public static final int MAX_DISTANCE = 100;	
-	
+	public static final int MAX_DISTANCE = 100;
+
 	final public Map<String, Position> positions = new HashMap<>();
 	public Position myPosition;
 
 	public void updatedPosition(String[] data) {
 		Position pos = new Position(data[1], data[2]);
 
-		if (pos.getDistance(myPosition) <= MAX_DISTANCE)
-			positions.put(data[0], pos);
+		// if (pos.getDistance(myPosition) <= MAX_DISTANCE) {
+		positions.put(data[0], pos);
+
+		// Notify the User
+		// Notify.INSTANCE.notify(getApplicationContext(), data[0]);
+		// }
 	}
 
 	public void updateMyPosition(Location location) {

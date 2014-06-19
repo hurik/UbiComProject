@@ -7,6 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import de.andreasgiemza.ubicomproject.helpers.Notify;
 import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
 
 public class GcmIntentService extends IntentService {
@@ -31,6 +32,13 @@ public class GcmIntentService extends IntentService {
 				if (data.length == 3) {
 					// Save the new position
 					PositionsStorage.INSTANCE.updatedPosition(data);
+
+					/*
+					 * TODO
+					 * nicht sinnvoll hier, da hier bei jedem aufruf benachrichtig wird
+					 */
+					// Notify the User
+					Notify.INSTANCE.notify(getApplicationContext(), data[0]);
 
 					// Inform the the main activity that there is a new position
 					Intent i = new Intent(BROADCAST_ACTION);
