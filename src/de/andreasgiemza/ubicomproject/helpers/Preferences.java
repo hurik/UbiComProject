@@ -15,7 +15,7 @@ public class Preferences {
 	private static final String NUMBER = "number";
 	private static final String REG_ID = "regId";
 	private static final String APP_VERSION = "appVersion";
-	private static final String ALLOWED ="allowed";
+	private static final String ALLOWED = "allowed";
 
 	private final Context context;
 	private final SharedPreferences prefs;
@@ -48,25 +48,29 @@ public class Preferences {
 
 	public void setAllowedNumbers(String allowedNumbers) {
 		editor.putString(ALLOWED, allowedNumbers);
-		editor.commit();		
+		editor.commit();
 	}
-	
-	public List<String> getAllowedNumbers() {
+
+	public String getAllowedNumbers() {
+		return prefs.getString(ALLOWED, "");
+	}
+
+	public List<String> getAllowedNumbersAsList() {
 		List<String> result = new ArrayList<>();
 		String numbers = prefs.getString(ALLOWED, "");
-		
-		if(numbers.equals(""))
+
+		if (numbers.equals(""))
 			return result;
-		
+
 		String numberList[] = numbers.split(";");
-		
-		for(String number : numberList) {
+
+		for (String number : numberList) {
 			result.add(number);
-		}	
-		
+		}
+
 		return result;
 	}
-	
+
 	public int getAppVersion() {
 		return prefs.getInt(APP_VERSION, Integer.MIN_VALUE);
 	}

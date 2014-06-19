@@ -117,7 +117,7 @@ public class AllowedNumbersActivity extends ListActivity {
 			setListAdapter(adapter);
 
 			Preferences prefs = new Preferences(getApplicationContext());
-			List<String> allowedNumbers = prefs.getAllowedNumbers();
+			List<String> allowedNumbers = prefs.getAllowedNumbersAsList();
 
 			for (int i = 0; i < adapter.getCount(); i++) {
 				String number = adapter.getItem(i).split("\n")[1];

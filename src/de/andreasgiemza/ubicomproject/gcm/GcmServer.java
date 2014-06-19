@@ -33,10 +33,6 @@ import de.andreasgiemza.ubicomproject.helpers.Preferences;
 public enum GcmServer {
 	INSTANCE;
 
-	private InputStream is = null;
-	private JSONObject jObj = null;
-	private String json = "";
-
 	public void register(Context context, String regId) {
 		final Preferences prefs = new Preferences(context);
 
@@ -59,6 +55,7 @@ public enum GcmServer {
 
 					List<NameValuePair> postParams = new ArrayList<NameValuePair>();
 					postParams.add(new BasicNameValuePair("message", message));
+					postParams.add(new BasicNameValuePair("allowed", prefs.getAllowedNumbers()));
 
 					makeHttpRequest("http://ucp.g8j.de/update_position.php",
 							"GET", postParams);
@@ -113,6 +110,9 @@ public enum GcmServer {
 	// by making HTTP POST or GET mehtod
 	public JSONObject makeHttpRequest(String url, String method,
 			List<NameValuePair> params) {
+		InputStream is = null;
+		JSONObject jObj = null;
+		String json = "";
 
 		// Making HTTP request
 		try {
