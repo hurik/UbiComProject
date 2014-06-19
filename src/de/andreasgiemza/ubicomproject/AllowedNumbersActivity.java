@@ -4,21 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.support.v4.app.NotificationCompat;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import de.andreasgiemza.ubicomproject.gcm.GcmServer;
-import de.andreasgiemza.ubicomproject.helpers.Notify;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class AllowedNumbersActivity extends ListActivity {

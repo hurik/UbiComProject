@@ -28,6 +28,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import de.andreasgiemza.ubicomproject.helpers.CalendarEvents;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public enum GcmServer {
@@ -46,6 +47,9 @@ public enum GcmServer {
 	public void updatePosition(Context context, final Location location) {
 		final Preferences prefs = new Preferences(context);
 
+//		if(CalendarEvents.isBusy(context))	// has CalenderEvent -> do nothing
+//			return;
+			
 		if (prefs.isRegistered() && checkInternetConnection(context)) {
 			new Thread(new Runnable() {
 				public void run() {
