@@ -72,7 +72,7 @@ public enum GcmServer {
 
 		for (String number : numbers) {
 			if (number != null)
-				numbersString += number.replaceAll("\\s", "") + ";";
+				numbersString += number + ";";
 		}
 
 		List<NameValuePair> postParams = new ArrayList<NameValuePair>();

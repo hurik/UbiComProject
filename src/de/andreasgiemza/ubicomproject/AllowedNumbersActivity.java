@@ -1,172 +1,73 @@
 package de.andreasgiemza.ubicomproject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.TooManyListenersException;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.util.Log;
-import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.util.SparseBooleanArray;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 import de.andreasgiemza.ubicomproject.gcm.GcmServer;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
-public class AllowedNumbersActivity extends Activity {
-
-	ListView mListView = null;
-	SimpleAdapter adapter = null;
-
-	// A ProgressDialog object
-	private ProgressDialog progressDialog;
+public class AllowedNumbersActivity extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (savedInstanceState != null) {
-			// status = savedInstanceState.getBooleanArray("status");
-		}
-
 		new LoadViewTask().execute();
 	}
 
 	@Override
-	protected void onStart() {
+	public void onBackPressed() {
+		String allowedNumbers = "";
 
-		super.onStart();
-
-	}
-
-	@Override
-	protected void onStop() {
-
-		// TODO save all allowed Number in Preferences
-		List<String> allowed = new ArrayList<>();
-		Adapter adapter = mListView.getAdapter();
-
-		for (int i = 0; i < adapter.getCount(); i++) {
-			Log.d("COUNT", String.valueOf(adapter.getCount()));// DEBUG
-
-			// Get listitem "togglelist.xml"
-			RelativeLayout listItem = (RelativeLayout) adapter.getView(i,
-					mListView.getChildAt(i), mListView);
-
-			Log.d("Layout", listItem.toString()); // DEBUG
-
-			// Child number 2 from item is toggleButton
-			ToggleButton tgl = (ToggleButton) listItem.getChildAt(2);
-
-			Log.d("Toggle", tgl.toString());// DEBUG
-			Log.d("IsChecked", String.valueOf(tgl.isChecked()));// DEBUG
-
-			// TODO <- ist immer true?
-			if (tgl.isChecked()) {
-				TextView text = (TextView) listItem.getChildAt(1);
-				String number = (String) text.getText();
-				Log.e("TEXT", number);//DEBUG
-			} else {
-				Log.e("TEXT", "false");//DEBUG				
+		SparseBooleanArray checked = getListView().getCheckedItemPositions();
+		for (int i = 0; i < checked.size(); i++) {
+			if (checked.valueAt(i) == true) {
+				String[] number = ((String) getListView().getItemAtPosition(
+						checked.keyAt(i))).split("\n");
+				allowedNumbers += number[1];
+				if (i != checked.size() - 1) {
+					allowedNumbers += ";";
+				}
 			}
 		}
 
-		super.onStop();
+		Preferences prefs = new Preferences(getApplicationContext());
+		prefs.setAllowedNumbers(allowedNumbers);
 
+		super.onBackPressed();
 	}
 
-	private String parseNumber(String string) {
-		if (string.charAt(0) == '+') {
-			return string;
-		}
-		string = string.replaceFirst("0", "+49");
+	private class LoadViewTask extends AsyncTask<String, String, String> {
 
-		return string;
-	}
-
-	private OnItemClickListener itemClickListener = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View item, int position,
-				long id) {
-
-			ListView listView = (ListView) parent;
-
-			SimpleAdapter adapter = (SimpleAdapter) listView.getAdapter();
-
-			HashMap<String, Object> hm = (HashMap<String, Object>) adapter
-					.getItem(position);
-
-			/** The clicked Item in the ListView */
-			RelativeLayout rLayout = (RelativeLayout) item;
-
-			/** Getting the toggle button corresponding to the clicked item */
-			ToggleButton tgl = (ToggleButton) rLayout.getChildAt(2);
-
-			String strStatus = "";
-			if (tgl.isChecked()) {
-				tgl.setChecked(false);
-				strStatus = "Off";
-				// status[position] = false;
-			} else {
-				tgl.setChecked(true);
-				strStatus = "On";
-				// status[position] = true;
-			}
-			Toast.makeText(getBaseContext(),
-					(String) hm.get("txt") + " : " + strStatus,
-					Toast.LENGTH_SHORT).show();
-		}
-	};
-
-	private class LoadViewTask extends AsyncTask<Void, Integer, Void> {
-		List<HashMap<String, Object>> aList;
+		ProgressDialog loadingDialog;
+		List<String> supportedNumbers = new ArrayList<>();
 
 		// Before running code in separate thread
 		@Override
 		protected void onPreExecute() {
-			// Create a new progress dialog
-			progressDialog = new ProgressDialog(AllowedNumbersActivity.this);
-			// Set the progress dialog to display a horizontal progress bar
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			// Set the dialog title to 'Loading...'
-			progressDialog.setTitle("Loading...");
-			// Set the dialog message to 'Loading application View, please
-			// wait...'
-			progressDialog
-					.setMessage("Loading application View, please wait...");
-			// This dialog can't be canceled by pressing the back key
-			progressDialog.setCancelable(false);
-			// This dialog isn't indeterminate
-			progressDialog.setIndeterminate(false);
-			// //The maximum number of items is 100
-			// progressDialog.setMax(100);
-			// //Set the current progress to zero
-			// progressDialog.setProgress(0);
-			// Display the progress dialog
-			progressDialog.show();
+			super.onPreExecute();
+
+			loadingDialog = new ProgressDialog(AllowedNumbersActivity.this);
+			loadingDialog.setMessage("Loading ...");
+			loadingDialog.setIndeterminate(false);
+			loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			loadingDialog.setCancelable(false);
+			loadingDialog.show();
 		}
 
 		// The code to be executed in a background thread.
 		@Override
-		protected Void doInBackground(Void... params) {
-			// Get the current thread's token
-			// synchronized (this) {
-
-			// TODO check if connected to Internet
-
+		protected String doInBackground(String... params) {
 			// Get all Numbers from Telephone-Book
 			List<String> allNumbers = new ArrayList<>();
 
@@ -182,7 +83,6 @@ public class AllowedNumbersActivity extends Activity {
 
 			// Save all Numbers in a List
 			while (contacts.moveToNext()) {
-
 				String contactNumber = contacts
 						.getString(contacts
 								.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
@@ -192,64 +92,51 @@ public class AllowedNumbersActivity extends Activity {
 			contacts.close();
 
 			// Get registered Numbers
-			List<String> registeredNumbers;
-			registeredNumbers = GcmServer.INSTANCE.getKnownNumbers(allNumbers);
-
-			Preferences pref = new Preferences(getApplicationContext());
-			// pref.setAllowedNumbers(registeredNumbers);
-
-			// Get allowedNumbers
-			List<String> allowedNumbers = pref.getAllowedNumbers();
-
-			// Each row in the list stores country name and its status
-			aList = new ArrayList<HashMap<String, Object>>();
+			List<String> registeredNumbers = GcmServer.INSTANCE
+					.getKnownNumbers(allNumbers);
 
 			for (String number : registeredNumbers) {
-				HashMap<String, Object> hm = new HashMap<String, Object>();
-				hm.put("txt", MainActivity.getContactName(
-						getApplicationContext(), number));
-				hm.put("numb", number);
-				hm.put("stat", allowedNumbers.contains(number) ? true : false);
-				aList.add(hm);
+				supportedNumbers.add(MainActivity.getContactName(
+						getApplicationContext(), number) + "\n" + number);
 			}
 
-			// }
 			return null;
-		}
-
-		// Update the progress
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-			// set the current progress of the progress dialog
-			progressDialog.setProgress(values[0]);
 		}
 
 		// after executing the code in the thread
 		@Override
-		protected void onPostExecute(Void result) {
-			// close the progress dialog
-			progressDialog.dismiss();
-			// initialize the View
-			setContentView(R.layout.activity_allowed_numbers);
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			loadingDialog.dismiss();
 
-			// Keys used in Hashmap
-			String[] from = { "txt", "numb", "stat" };
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+					AllowedNumbersActivity.this,
+					android.R.layout.simple_list_item_multiple_choice,
+					supportedNumbers);
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			setListAdapter(adapter);
 
-			// Ids of views in listview_layout
-			int[] to = { R.id.togglelist_name, R.id.togglelist_number,
-					R.id.togglelist_status };
+			Preferences prefs = new Preferences(getApplicationContext());
+			List<String> allowedNumbers = prefs.getAllowedNumbers();
 
-			// Instantiating an adapter to store each items
-			// R.layout.listview_layout defines the layout of each item
-			adapter = new SimpleAdapter(getBaseContext(), aList,
-					R.layout.togglelist, from, to);
+			for (int i = 0; i < adapter.getCount(); i++) {
+				String number = adapter.getItem(i).split("\n")[1];
 
-			mListView = (ListView) findViewById(R.id.list_number);
-
-			// mListView.setOnItemClickListener(itemClickListener);
-
-			// TODO check if null
-			mListView.setAdapter(adapter);
+				if (allowedNumbers.contains(number)) {
+					getListView().setItemChecked(i, true);
+				}
+			}
 		}
+	}
+
+	private String parseNumber(String string) {
+		string = string.replaceAll("\\s", "");
+
+		if (string.startsWith("+"))
+			return string;
+		else if (string.startsWith("00"))
+			return string.replaceFirst("00", "+");
+		else
+			return string.replaceFirst("0", "+49");
 	}
 }
