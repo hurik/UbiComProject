@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -55,6 +56,15 @@ public class MainActivity extends Activity {
 
 		// show own position
 		googleMap.setMyLocationEnabled(true);
+
+		Intent intent = getIntent();
+		double lat = intent.getDoubleExtra("Latitude", 0);
+		double lng = intent.getDoubleExtra("Longitude", 0);
+
+		if (lat != 0 && lng != 0) {
+			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+					new LatLng(lat, lng), 15));
+		}
 
 		// start Service
 		startService(new Intent(getBaseContext(), LocationService.class));

@@ -47,7 +47,7 @@ public enum PositionsStorage {
 					if (System.currentTimeMillis() - last.lastNotification > Preferences.MIN_TIME) {
 						sendNotification(
 								MainActivity.getContactName(context, number),
-								context);
+								pos, context);
 
 						notify.put(
 								number,
@@ -71,12 +71,16 @@ public enum PositionsStorage {
 		myPosition = new Position(location);
 	}
 
-	private void sendNotification(String msg, Context context) {
+	private void sendNotification(String msg, Position pos, Context context) {
 		NotificationManager mNotificationManager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
+		Intent zoom = new Intent(context, MainActivity.class);
+		zoom.putExtra("Latitude", pos.location.getLatitude());
+		zoom.putExtra("Longitude", pos.location.getLongitude());
+
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				new Intent(context, MainActivity.class), 0);
+				zoom, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				context)
@@ -85,7 +89,8 @@ public enum PositionsStorage {
 						context.getResources().getString(
 								R.string.notification_title))
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-				.setDefaults(Notification.DEFAULT_ALL).setContentText(msg);
+				.setDefaults(Notification.DEFAULT_ALL).setAutoCancel(true)
+				.setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager.notify(1, mBuilder.build());
