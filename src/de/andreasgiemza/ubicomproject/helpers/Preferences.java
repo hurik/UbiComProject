@@ -15,6 +15,9 @@ public class Preferences {
 	public static final String GCMPoject = "470689489809";
 	public static final String GCMServer = "http://ucp.g8j.de/";
 
+	public static final int MAX_DISTANCE = 250;
+	public static final int MIN_TIME = 20 * 60 * 1000;
+
 	private static final String NUMBER = "number";
 	private static final String REG_ID = "regId";
 	private static final String APP_VERSION = "appVersion";
