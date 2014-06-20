@@ -12,6 +12,9 @@ import de.andreasgiemza.ubicomproject.MainActivity;
 
 public class Preferences {
 
+	public static final String GCMPoject = "470689489809";
+	public static final String GCMServer = "http://ucp.g8j.de/";
+
 	private static final String NUMBER = "number";
 	private static final String REG_ID = "regId";
 	private static final String APP_VERSION = "appVersion";

@@ -40,14 +40,12 @@ public enum GcmServer {
 		getPrarams.add(new BasicNameValuePair("number", prefs.getNumber()));
 		getPrarams.add(new BasicNameValuePair("gcm", regId));
 
-		makeHttpRequest("http://ucp.g8j.de/register.php", "GET", getPrarams);
+		makeHttpRequest(Preferences.GCMServer + "register.php", "GET",
+				getPrarams);
 	}
 
 	public void updatePosition(Context context, final Location location) {
 		final Preferences prefs = new Preferences(context);
-
-		// if(CalendarEvents.isBusy(context)) // has CalenderEvent -> do nothing
-		// return;
 
 		if (prefs.isRegistered() && checkInternetConnection(context)) {
 			new Thread(new Runnable() {
@@ -61,8 +59,8 @@ public enum GcmServer {
 					postParams.add(new BasicNameValuePair("allowed", prefs
 							.getAllowedNumbers()));
 
-					makeHttpRequest("http://ucp.g8j.de/update_position.php",
-							"GET", postParams);
+					makeHttpRequest(Preferences.GCMServer
+							+ "update_position.php", "GET", postParams);
 				}
 			}).start();
 		}

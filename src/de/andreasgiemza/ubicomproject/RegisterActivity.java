@@ -102,7 +102,7 @@ public class RegisterActivity extends Activity {
 			try {
 				// Register device with google cloud messaging
 				gcm = GoogleCloudMessaging.getInstance(context);
-				String regId = gcm.register("470689489809");
+				String regId = gcm.register(Preferences.GCMPoject);
 
 				prefs.setRegId(regId);
 				prefs.setAppVersion(prefs.getCurrentAppVersion());
