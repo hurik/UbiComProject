@@ -5,15 +5,13 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.helpers.Phonebook;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class AllowedNumbersActivity extends ListActivity {
@@ -70,34 +68,15 @@ public class AllowedNumbersActivity extends ListActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			// Get all Numbers from Telephone-Book
-			List<String> allNumbers = new ArrayList<>();
-
-			String projection[] = { Phone.NUMBER };
-			String selection = ContactsContract.Contacts.IN_VISIBLE_GROUP
-					+ " = '" + ("1") + "'" + " AND "
-					+ ContactsContract.Contacts.HAS_PHONE_NUMBER;
-			String selectionArgs[] = null;
-			String sortOrder = Phone.DISPLAY_NAME + " ASC";
-
-			Cursor contacts = getContentResolver().query(Phone.CONTENT_URI,
-					projection, selection, selectionArgs, sortOrder);
-
-			// Save all Numbers in a List
-			while (contacts.moveToNext()) {
-				String contactNumber = contacts
-						.getString(contacts
-								.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-				allNumbers.add(parseNumber(contactNumber));
-			}
-
-			contacts.close();
+			List<String> allNumbers = Phonebook.INSTANCE
+					.getAllNumbers(getApplicationContext());
 
 			// Get registered Numbers
 			List<String> registeredNumbers = GcmServer.INSTANCE
 					.getKnownNumbers(allNumbers);
 
 			for (String number : registeredNumbers) {
-				supportedNumbers.add(MainActivity.getContactName(
+				supportedNumbers.add(Phonebook.INSTANCE.getContactName(
 						getApplicationContext(), number) + "\n" + number);
 			}
 
@@ -130,14 +109,4 @@ public class AllowedNumbersActivity extends ListActivity {
 		}
 	}
 
-	private String parseNumber(String string) {
-		string = string.replaceAll("\\s", "");
-
-		if (string.startsWith("+"))
-			return string;
-		else if (string.startsWith("00"))
-			return string.replaceFirst("00", "+");
-		else
-			return string.replaceFirst("0", "+49");
-	}
 }

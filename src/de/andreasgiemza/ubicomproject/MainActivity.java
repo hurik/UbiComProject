@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.wifi.WifiEnterpriseConfig.Phase2;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.PhoneLookup;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmIntentService;
+import de.andreasgiemza.ubicomproject.helpers.Phonebook;
 import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
 import de.andreasgiemza.ubicomproject.helpers.PositionsStorage.Position;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
@@ -103,7 +105,7 @@ public class MainActivity extends Activity {
 					.getValue().time) / 1000 / 60);
 
 			if (elapsedMinutes < 20) {
-				String markerText = getContactName(getApplicationContext(),
+				String markerText = Phonebook.INSTANCE.getContactName(getApplicationContext(),
 						entry.getKey())
 						+ "\n"
 						+ (entry.getValue().distance != Integer.MAX_VALUE ? (entry
@@ -168,28 +170,6 @@ public class MainActivity extends Activity {
 			drawFriends();
 		};
 	};
-
-	public static String getContactName(Context context, String phoneNumber) {
-		ContentResolver cr = context.getContentResolver();
-		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
-				Uri.encode(phoneNumber));
-		Cursor cursor = cr.query(uri,
-				new String[] { PhoneLookup.DISPLAY_NAME }, null, null, null);
-		if (cursor == null) {
-			return phoneNumber;
-		}
-		String contactName = phoneNumber;
-		if (cursor.moveToFirst()) {
-			contactName = cursor.getString(cursor
-					.getColumnIndex(PhoneLookup.DISPLAY_NAME));
-		}
-
-		if (cursor != null && !cursor.isClosed()) {
-			cursor.close();
-		}
-
-		return contactName;
-	}
 
 	Handler timerHandler = new Handler();
 	Runnable timerRunnable = new Runnable() {
