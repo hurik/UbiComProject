@@ -14,8 +14,9 @@ import android.provider.CalendarContract;
  * 
  */
 
-public class CalendarEvents {
-
+public enum CalendarEvents {
+	INSTANCE;
+	
 	public static class MyCalenderEvent {
 		private String title;
 		private Date start;
@@ -55,15 +56,15 @@ public class CalendarEvents {
 	private CalendarEvents() {
 	}
 
-	public static MyCalenderEvent getNextEvent(Context context) {
+	public MyCalenderEvent getNextEvent(Context context) {
 		return readCalendar(context, false);
 	}
 
-	public static MyCalenderEvent getCurrentEvent(Context context) {
+	public MyCalenderEvent getCurrentEvent(Context context) {
 		return readCalendar(context, true);
 	}
 
-	public static boolean isBusy(Context context) {
+	public  boolean isBusy(Context context) {
 		return (readCalendar(context, true) != null);
 
 	}
@@ -71,7 +72,7 @@ public class CalendarEvents {
 	/*
 	 * current == true -> get current Event current == false -> getNextEvent
 	 */
-	private static MyCalenderEvent readCalendar(Context context, boolean current) {
+	private MyCalenderEvent readCalendar(Context context, boolean current) {
 
 		long time = Calendar.getInstance().getTimeInMillis();
 
