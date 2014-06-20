@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +21,7 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
 
@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
 
 		for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
 				.entrySet()) {
-			
+
 			int elapsedMinutes = (int) ((System.currentTimeMillis() - entry
 					.getValue().time) / 1000 / 60);
 
@@ -96,6 +96,11 @@ public class MainActivity extends Activity {
 				String markerText = getContactName(getApplicationContext(),
 						entry.getKey())
 						+ "\n"
+						+ (entry.getValue().distance != Integer.MAX_VALUE ? (entry
+								.getValue().distance
+								+ getResources()
+										.getString(R.string.main_m_away) + "\n")
+								: "")
 						+ (elapsedMinutes < 1 ? "< 1" : elapsedMinutes)
 						+ " "
 						+ (elapsedMinutes < 2 ? getResources().getString(
@@ -105,7 +110,11 @@ public class MainActivity extends Activity {
 				MarkerOptions markerOptions = new MarkerOptions()
 						.icon(BitmapDescriptorFactory.fromBitmap(iconFactory
 								.makeIcon(markerText)))
-						.position(entry.getValue().latLng)
+						.position(
+								new LatLng(entry.getValue().location
+										.getLatitude(),
+										entry.getValue().location
+												.getLongitude()))
 						.anchor(iconFactory.getAnchorU(),
 								iconFactory.getAnchorV());
 
