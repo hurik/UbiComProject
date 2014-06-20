@@ -13,6 +13,9 @@ import android.provider.ContactsContract.PhoneLookup;
 
 public final class Phonebook {
 
+	private Phonebook() {
+	}
+
 	public static List<String> getAllNumbers(Context context) {
 		List<String> allNumbers = new ArrayList<>();
 

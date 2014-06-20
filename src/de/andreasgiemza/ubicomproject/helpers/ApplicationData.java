@@ -4,15 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Application;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
-import android.support.v4.app.NotificationCompat;
-import de.andreasgiemza.ubicomproject.MainActivity;
-import de.andreasgiemza.ubicomproject.R;
 
 public class ApplicationData extends Application {
 
@@ -45,7 +38,7 @@ public class ApplicationData extends Application {
 				if (last.near == false) {
 					// Check if last notification is MIN_TIME ago
 					if (System.currentTimeMillis() - last.lastNotification > Preferences.MIN_TIME) {
-						sendNotification(
+						Notify.sendNotification(
 								Phonebook.getContactName(context, number), pos,
 								context);
 
@@ -67,31 +60,6 @@ public class ApplicationData extends Application {
 
 	public void updateMyPosition(Location location) {
 		myPosition = new Position(location);
-	}
-
-	private void sendNotification(String msg, Position pos, Context context) {
-		NotificationManager mNotificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		Intent zoom = new Intent(context, MainActivity.class);
-		zoom.putExtra("Latitude", pos.location.getLatitude());
-		zoom.putExtra("Longitude", pos.location.getLongitude());
-
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				zoom, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				context)
-				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(
-						context.getResources().getString(
-								R.string.notification_title))
-				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-				.setDefaults(Notification.DEFAULT_ALL).setAutoCancel(true)
-				.setContentText(msg);
-
-		mBuilder.setContentIntent(contentIntent);
-		mNotificationManager.notify(1, mBuilder.build());
 	}
 
 	public class Position {
