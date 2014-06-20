@@ -10,91 +10,60 @@ import android.location.Location;
 public class ApplicationData extends Application {
 
 	final public Map<String, Position> positions = new HashMap<>();
-	public Position myPosition;
-
-	final public Map<String, NotificationData> notificationData = new HashMap<>();
+	private Location myLocation;
 
 	public void updatedPosition(String[] data, Context context) {
 		String number = data[0];
-		Position pos = new Position(data[1], data[2]);
+		Position pos = new Position(number, data[1], data[2],
+				positions.get(number), context);
 		positions.put(number, pos);
-
-		// Check if distance was calculated
-		if (pos.distance != Integer.MAX_VALUE) {
-			// Check if notification data was saved
-			NotificationData last = notificationData.get(number);
-
-			// No notify data is saved
-			if (last == null) {
-				// Save current status and return
-				notificationData.put(number, new NotificationData(
-						pos.distance < Preferences.MAX_DISTANCE, 0));
-				return;
-			}
-
-			// Check distance
-			if (pos.distance < Preferences.MAX_DISTANCE) {
-				// Check if old near was false, else do nothing
-				if (last.near == false) {
-					// Check if last notification is MIN_TIME ago
-					if (System.currentTimeMillis() - last.lastNotification > Preferences.MIN_TIME) {
-						Notify.sendNotification(
-								Phonebook.getContactName(context, number), pos,
-								context);
-
-						notificationData.put(number, new NotificationData(true,
-								System.currentTimeMillis()));
-					} else {
-						notificationData.put(number, new NotificationData(true,
-								last.lastNotification));
-					}
-				}
-			} else {
-				if (last.near == true) {
-					notificationData.put(number, new NotificationData(false,
-							last.lastNotification));
-				}
-			}
-		}
 	}
 
 	public void updateMyPosition(Location location) {
-		myPosition = new Position(location);
+		myLocation = location;
 	}
 
 	public class Position {
 		public final Location location;
-		public final long time = System.currentTimeMillis();
+		public final long time;
 		public final int distance;
-
-		public Position(String latitude, String longitude) {
-			location = new Location("");
-			location.setLatitude(Double.parseDouble(latitude));
-			location.setLongitude(Double.parseDouble(longitude));
-
-			if (myPosition != null)
-				distance = (int) location.distanceTo(myPosition.location);
-			else
-				distance = Integer.MAX_VALUE;
-		}
-
-		public Position(Location location) {
-			this.location = location;
-
-			if (myPosition != null)
-				distance = (int) location.distanceTo(myPosition.location);
-			else
-				distance = Integer.MAX_VALUE;
-		}
-	}
-
-	public class NotificationData {
-		public final boolean near;
+		// For notification
 		public final long lastNotification;
 
-		public NotificationData(boolean near, long lastNotification) {
-			this.near = near;
-			this.lastNotification = lastNotification;
+		public Position(String number, String latitude, String longitude,
+				Position oldPosition, Context context) {
+			// Set location
+			location = new Location(number);
+			location.setLatitude(Double.parseDouble(latitude));
+			location.setLongitude(Double.parseDouble(longitude));
+			// Set time with current time
+			time = System.currentTimeMillis();
+			// Get distance, if my location was set ...
+			if (myLocation != null)
+				distance = (int) location.distanceTo(myLocation);
+			else
+				distance = Integer.MAX_VALUE;
+			// Set lastNotification time
+			if (oldPosition == null) {
+				// Set last notification time to zero, because there was never a
+				// notification
+				lastNotification = 0;
+			} else {
+				// If a friend enters the 250 m circle and the last notification
+				// was more than 20 minutes ago, send a notification
+				if (distance <= Preferences.MAX_DISTANCE
+						&& oldPosition.distance > Preferences.MAX_DISTANCE
+						&& System.currentTimeMillis()
+								- oldPosition.lastNotification > Preferences.MIN_TIME) {
+					Notify.sendNotification(
+							Phonebook.getContactName(context, number), this,
+							context);
+					lastNotification = System.currentTimeMillis();
+				} else {
+					// Nothing important happened, take on the old value
+					lastNotification = oldPosition.lastNotification;
+				}
+			}
 		}
 	}
 }
