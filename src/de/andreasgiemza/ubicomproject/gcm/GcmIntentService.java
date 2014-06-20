@@ -7,7 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
+import de.andreasgiemza.ubicomproject.helpers.ApplicationData;
 
 public class GcmIntentService extends IntentService {
 
@@ -30,7 +30,7 @@ public class GcmIntentService extends IntentService {
 
 				if (data.length == 3) {
 					// Save the new position
-					PositionsStorage.INSTANCE.updatedPosition(data, getApplicationContext());
+					((ApplicationData)this.getApplication()).updatedPosition(data, getApplicationContext());
 
 					// Inform the the main activity that there is a new position
 					Intent i = new Intent(BROADCAST_ACTION);

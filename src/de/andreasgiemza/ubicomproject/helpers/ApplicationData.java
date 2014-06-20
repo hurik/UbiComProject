@@ -3,6 +3,7 @@ package de.andreasgiemza.ubicomproject.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,13 +14,12 @@ import android.support.v4.app.NotificationCompat;
 import de.andreasgiemza.ubicomproject.MainActivity;
 import de.andreasgiemza.ubicomproject.R;
 
-public enum PositionsStorage {
-	INSTANCE;
+public class ApplicationData extends Application {
 
 	final public Map<String, Position> positions = new HashMap<>();
 	public Position myPosition;
 
-	final public Map<String, NotificationData> notify = new HashMap<>();
+	final public Map<String, NotificationData> notificationData = new HashMap<>();
 
 	public void updatedPosition(String[] data, Context context) {
 		String number = data[0];
@@ -29,12 +29,12 @@ public enum PositionsStorage {
 		// Check if distance was calculated
 		if (pos.distance != Integer.MAX_VALUE) {
 			// Check if notification data was saved
-			NotificationData last = notify.get(number);
+			NotificationData last = notificationData.get(number);
 
 			// No notify data is saved
 			if (last == null) {
 				// Save current status and return
-				notify.put(number, new NotificationData(
+				notificationData.put(number, new NotificationData(
 						pos.distance < Preferences.MAX_DISTANCE, 0));
 				return;
 			}
@@ -49,18 +49,16 @@ public enum PositionsStorage {
 								Phonebook.getContactName(context, number), pos,
 								context);
 
-						notify.put(
-								number,
-								new NotificationData(true, System
-										.currentTimeMillis()));
+						notificationData.put(number, new NotificationData(true,
+								System.currentTimeMillis()));
 					} else {
-						notify.put(number, new NotificationData(true,
+						notificationData.put(number, new NotificationData(true,
 								last.lastNotification));
 					}
 				}
 			} else {
 				if (last.near == true) {
-					notify.put(number, new NotificationData(false,
+					notificationData.put(number, new NotificationData(false,
 							last.lastNotification));
 				}
 			}

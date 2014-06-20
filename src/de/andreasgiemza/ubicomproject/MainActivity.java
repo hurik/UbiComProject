@@ -23,9 +23,9 @@ import com.google.maps.android.ui.IconGenerator;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmIntentService;
 import de.andreasgiemza.ubicomproject.helpers.Phonebook;
-import de.andreasgiemza.ubicomproject.helpers.PositionsStorage;
-import de.andreasgiemza.ubicomproject.helpers.PositionsStorage.Position;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
+import de.andreasgiemza.ubicomproject.helpers.ApplicationData;
+import de.andreasgiemza.ubicomproject.helpers.ApplicationData.Position;
 import de.andreasgiemza.ubicomproject.location.LocationService;
 
 public class MainActivity extends Activity {
@@ -92,8 +92,8 @@ public class MainActivity extends Activity {
 
 		IconGenerator iconFactory = new IconGenerator(getApplicationContext());
 
-		for (Entry<String, Position> entry : PositionsStorage.INSTANCE.positions
-				.entrySet()) {
+		for (Entry<String, Position> entry : ((ApplicationData) this
+				.getApplication()).positions.entrySet()) {
 
 			int elapsedMinutes = (int) ((System.currentTimeMillis() - entry
 					.getValue().time) / 1000 / 60);
@@ -175,5 +175,4 @@ public class MainActivity extends Activity {
 			timerHandler.postDelayed(this, 15 * 1000);
 		}
 	};
-
 }

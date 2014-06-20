@@ -16,7 +16,7 @@
     <!-- permission for reading telephone-number -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!-- permission for reading calender events -->
+    <!-- permission for reading calendar events -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <!-- permission for reading telephone contacts -->
@@ -51,6 +51,7 @@
         android:required="true" />
 
     <application
+        android:name="de.andreasgiemza.ubicomproject.helpers.ApplicationData"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
