@@ -46,8 +46,8 @@ public enum PositionsStorage {
 					// Check if last notification is MIN_TIME ago
 					if (System.currentTimeMillis() - last.lastNotification > Preferences.MIN_TIME) {
 						sendNotification(
-								MainActivity.getContactName(context, number),
-								pos, context);
+								Phonebook.getContactName(context, number), pos,
+								context);
 
 						notify.put(
 								number,

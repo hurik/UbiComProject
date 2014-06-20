@@ -4,16 +4,10 @@ import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.net.Uri;
-import android.net.wifi.WifiEnterpriseConfig.Phase2;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,8 +99,8 @@ public class MainActivity extends Activity {
 					.getValue().time) / 1000 / 60);
 
 			if (elapsedMinutes < 20) {
-				String markerText = Phonebook.INSTANCE.getContactName(getApplicationContext(),
-						entry.getKey())
+				String markerText = Phonebook.getContactName(
+						getApplicationContext(), entry.getKey())
 						+ "\n"
 						+ (entry.getValue().distance != Integer.MAX_VALUE ? (entry
 								.getValue().distance

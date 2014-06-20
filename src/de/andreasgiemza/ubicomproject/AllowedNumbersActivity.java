@@ -68,7 +68,7 @@ public class AllowedNumbersActivity extends ListActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			// Get all Numbers from Telephone-Book
-			List<String> allNumbers = Phonebook.INSTANCE
+			List<String> allNumbers = Phonebook
 					.getAllNumbers(getApplicationContext());
 
 			// Get registered Numbers
@@ -76,7 +76,7 @@ public class AllowedNumbersActivity extends ListActivity {
 					.getKnownNumbers(allNumbers);
 
 			for (String number : registeredNumbers) {
-				supportedNumbers.add(Phonebook.INSTANCE.getContactName(
+				supportedNumbers.add(Phonebook.getContactName(
 						getApplicationContext(), number) + "\n" + number);
 			}
 

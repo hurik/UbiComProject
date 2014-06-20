@@ -11,10 +11,9 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.PhoneLookup;
 
-public enum Phonebook {
-	INSTANCE;
+public final class Phonebook {
 
-	public List<String> getAllNumbers(Context context) {
+	public static List<String> getAllNumbers(Context context) {
 		List<String> allNumbers = new ArrayList<>();
 
 		String projection[] = { Phone.NUMBER };
@@ -36,11 +35,11 @@ public enum Phonebook {
 		}
 
 		contacts.close();
-		
+
 		return allNumbers;
 	}
 
-	public String getContactName(Context context, String phoneNumber) {
+	public static String getContactName(Context context, String phoneNumber) {
 		ContentResolver cr = context.getContentResolver();
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI,
 				Uri.encode(phoneNumber));
@@ -62,7 +61,7 @@ public enum Phonebook {
 		return contactName;
 	}
 
-	private String parseNumber(String string) {
+	private static String parseNumber(String string) {
 		string = string.replaceAll("\\s", "");
 
 		if (string.startsWith("+"))
