@@ -12,6 +12,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import de.andreasgiemza.ubicomproject.gcm.GcmIntentService;
+import de.andreasgiemza.ubicomproject.helpers.InternetConnection;
 import de.andreasgiemza.ubicomproject.helpers.Phonebook;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 import de.andreasgiemza.ubicomproject.helpers.ApplicationData;
@@ -134,8 +136,16 @@ public class MainActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.number:
-			startActivity(new Intent(getApplicationContext(),
-					AllowedNumbersActivity.class));
+			if (InternetConnection.check(getApplicationContext())) {
+				startActivity(new Intent(getApplicationContext(),
+						AllowedNumbersActivity.class));
+			} else {
+				Toast.makeText(
+						getApplicationContext(),
+						getResources().getString(
+								R.string.internet_connection_needed),
+						Toast.LENGTH_SHORT).show();
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

@@ -25,9 +25,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
+import de.andreasgiemza.ubicomproject.helpers.InternetConnection;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public final class UbiComProjectServer {
@@ -46,7 +45,7 @@ public final class UbiComProjectServer {
 	public static void updatePosition(Context context, final Location location) {
 		final Preferences prefs = new Preferences(context);
 
-		if (prefs.isRegistered() && checkInternetConnection(context)) {
+		if (prefs.isRegistered() && InternetConnection.check(context)) {
 			new Thread(new Runnable() {
 				public void run() {
 					String message = prefs.getNumber() + ";"
@@ -171,18 +170,5 @@ public final class UbiComProjectServer {
 
 		// return JSON String
 		return jObj;
-	}
-
-	// Helpers
-	private static boolean checkInternetConnection(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-		if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-			return true;
-		}
-
-		return false;
 	}
 }

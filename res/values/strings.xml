@@ -12,4 +12,6 @@
     <string name="allowed_numbers">Allowed numbers</string>
     <string name="loading">Loading &#8230;</string>
     <string name="notification_title">Person in the vicinity!</string>
+    <string name="internet_connection_needed">Internet connection is needed to use this feature!</string>
+
 </resources>
