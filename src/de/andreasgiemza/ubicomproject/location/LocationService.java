@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.gcm.UbiComProjectServer;
 import de.andreasgiemza.ubicomproject.helpers.ApplicationData;
 
 public class LocationService extends Service implements
@@ -136,7 +136,7 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		GcmServer.INSTANCE.updatePosition(getApplicationContext(), location);
+		UbiComProjectServer.updatePosition(getApplicationContext(), location);
 		((ApplicationData) this.getApplication()).updateMyPosition(location);
 	}
 }

@@ -30,10 +30,9 @@ import android.net.NetworkInfo;
 import android.util.Log;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
-public enum GcmServer {
-	INSTANCE;
+public final class UbiComProjectServer {
 
-	public void register(Context context, String regId) {
+	public static void register(Context context, String regId) {
 		final Preferences prefs = new Preferences(context);
 
 		List<NameValuePair> getPrarams = new ArrayList<NameValuePair>();
@@ -44,7 +43,7 @@ public enum GcmServer {
 				getPrarams);
 	}
 
-	public void updatePosition(Context context, final Location location) {
+	public static void updatePosition(Context context, final Location location) {
 		final Preferences prefs = new Preferences(context);
 
 		if (prefs.isRegistered() && checkInternetConnection(context)) {
@@ -66,7 +65,7 @@ public enum GcmServer {
 		}
 	}
 
-	public List<String> getKnownNumbers(final List<String> numbers) {
+	public static List<String> getKnownNumbers(final List<String> numbers) {
 		String numbersString = "";
 
 		for (String number : numbers) {
@@ -110,7 +109,7 @@ public enum GcmServer {
 
 	// function get json from url
 	// by making HTTP POST or GET mehtod
-	public JSONObject makeHttpRequest(String url, String method,
+	public static JSONObject makeHttpRequest(String url, String method,
 			List<NameValuePair> params) {
 		InputStream is = null;
 		JSONObject jObj = null;
@@ -175,7 +174,7 @@ public enum GcmServer {
 	}
 
 	// Helpers
-	private boolean checkInternetConnection(Context context) {
+	private static boolean checkInternetConnection(Context context) {
 		ConnectivityManager cm = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();

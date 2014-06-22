@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.gcm.UbiComProjectServer;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class RegisterActivity extends Activity {
@@ -108,7 +108,7 @@ public class RegisterActivity extends Activity {
 				prefs.setAppVersion(prefs.getCurrentAppVersion());
 
 				// Register device with own server
-				GcmServer.INSTANCE.register(getApplicationContext(), regId);
+				UbiComProjectServer.register(getApplicationContext(), regId);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

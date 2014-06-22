@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import de.andreasgiemza.ubicomproject.gcm.GcmServer;
+import de.andreasgiemza.ubicomproject.gcm.UbiComProjectServer;
 import de.andreasgiemza.ubicomproject.helpers.Phonebook;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
@@ -72,7 +72,7 @@ public class AllowedNumbersActivity extends ListActivity {
 					.getAllNumbers(getApplicationContext());
 
 			// Get registered Numbers
-			List<String> registeredNumbers = GcmServer.INSTANCE
+			List<String> registeredNumbers = UbiComProjectServer
 					.getKnownNumbers(allNumbers);
 
 			for (String number : registeredNumbers) {
