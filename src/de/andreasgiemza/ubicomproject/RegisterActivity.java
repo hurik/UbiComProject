@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import de.andreasgiemza.ubicomproject.gcm.UbiComProjectServer;
+import de.andreasgiemza.ubicomproject.helpers.InternetConnection;
+import de.andreasgiemza.ubicomproject.helpers.Phonebook;
 import de.andreasgiemza.ubicomproject.helpers.Preferences;
 
 public class RegisterActivity extends Activity {
@@ -55,10 +57,23 @@ public class RegisterActivity extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
+				// check if there is a internet connection
+				if (!InternetConnection.check(getApplicationContext())) {
+					Toast.makeText(
+							getApplicationContext(),
+							getResources().getString(
+									R.string.internet_connection_needed),
+							Toast.LENGTH_SHORT).show();
+					return;
+				}
+
 				String number = registerNumber.getText().toString();
 
 				// Check if user filled the form
 				if (number.trim().length() > 0) {
+					// Parse the number
+					number = Phonebook.parseNumber(number);
+
 					// Save number
 					prefs.setNumber(number);
 					// Check if regId is already saved or the app version

@@ -64,7 +64,7 @@ public final class Phonebook {
 		return contactName;
 	}
 
-	private static String parseNumber(String string) {
+	public static String parseNumber(String string) {
 		string = string.replaceAll("\\s", "");
 
 		if (string.startsWith("+"))
