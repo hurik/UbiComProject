@@ -5,8 +5,12 @@
 ### MainActivity.java ###
 Shows own location and locations of near friends.
 
-###	SettingsActivity.java ###
-Settings for the application, for example your mobile number.
+###	RegisterActivity.java ###
+Starts when you start the first time the app. You must enter your Phonenumber to register your phone on the server. When the own phone number is stored at the sim card, you must not enter the number.
+
+### AllowedNumbersActivity ###
+In the activity Allowed Number you see all registered and existing Numbers from your Phone. Here you can enable or disable sending the position to your friend.
+
 
 ### services.BootBroadcastReceiver.java ###
 Starts the LocationService and NotificationService after the handy was booted.
@@ -17,6 +21,25 @@ Service which gets the own location and upload it on the FTP server.
 ### services.NotificationService.java ###
 Service which gets the location of known numbers from the FTP server and provide them for the MainActicity.java. It also creates notifications, if a friend is near.
 
+### helpers.ApplicationData.java ###
+ApplicationData saves your and all position of your friend. Also saves the Date of the last Notification from every person.
+
+### helpers.CalendarEvents.java ###
+In ClanderEvents you can get the current or next Event from the Calendar or you can check if the owner of the Phone is busy or not.  
+
+### helpers.InternetConnection.java ###
+Here you can check if the phone connected to the internet.
+
+### helpers.Notify.java ###
+notify is a class to create a Notification on your Phone. After clicking the Notification youzZoom to the location of your friend near.
+
+### helpers.Phonebook.java ###
+With the class Phonebook you can read all Numbers from your Phone or get the name associated with a phonenumber.
+And you can check whether a phonenumbers starts with +49 and correct them if necessary.
+
+### helpers.Preferences.java ###
+In the preferences all settings are stored.
+This applies the allowednumbers, the app version, the registration ID and your own number.
 
 ## Tutorials ##
 
