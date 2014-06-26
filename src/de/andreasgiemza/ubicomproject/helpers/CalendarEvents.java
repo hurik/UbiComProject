@@ -17,15 +17,20 @@ import android.provider.CalendarContract;
 public enum CalendarEvents {
 	INSTANCE;
 	
+	public final static int MAX_EVENT_LENGHT = 20; // In Hours
+	public final static int MS_PER_HOUR = 3600000;
+
 	public static class MyCalenderEvent {
 		private String title;
 		private Date start;
 		private Date end;
+		private String description;
 
-		public MyCalenderEvent(String title, Date start, Date end) {
+		public MyCalenderEvent(String title, Date start, Date end, String description) {
 			this.title = title;
 			this.start = start;
 			this.end = end;
+			this.description = description;
 		}
 
 		public String getTitle() {
@@ -51,9 +56,14 @@ public enum CalendarEvents {
 		public void setEnd(Date end) {
 			this.end = end;
 		}
-	}
 
-	private CalendarEvents() {
+		public String getDescription() {
+			return description;
+		}
+
+		public void setDescription(String description) {
+			this.description = description;
+		}
 	}
 
 	public MyCalenderEvent getNextEvent(Context context) {
@@ -64,7 +74,7 @@ public enum CalendarEvents {
 		return readCalendar(context, true);
 	}
 
-	public  boolean isBusy(Context context) {
+	public boolean isBusy(Context context) {
 		return (readCalendar(context, true) != null);
 
 	}
@@ -78,9 +88,10 @@ public enum CalendarEvents {
 
 		ContentResolver contentResolver = context.getContentResolver();
 
-		// Get Title, Start and End-Time
+		// Get Title, Start and End-Time, Description
 		String[] projection = new String[] { CalendarContract.Events.TITLE,
-				CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND };
+				CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND,
+				CalendarContract.Events.DESCRIPTION };
 
 		String selection = null;
 		if (current) {
@@ -99,11 +110,24 @@ public enum CalendarEvents {
 		if (!cursor.moveToFirst())
 			return null; // Keine Daten -> return
 
-		Date start = new Date(cursor.getLong(1));
-		Date end = new Date(cursor.getLong(2));
+		long start_ms = cursor.getLong(1);
+		long end_ms = cursor.getLong(2);
+
+		// delete all Events with more than MAX_EVENT_LENGHT Hours
+		while (true) {
+			if ((end_ms - start_ms) >= MAX_EVENT_LENGHT * MS_PER_HOUR) { // next event?
+				if (!cursor.moveToNext())
+					return null;
+			} else {
+				break;
+			}
+		}
+
+		Date start = new Date(start_ms);
+		Date end = new Date(end_ms);
 
 		MyCalenderEvent event = new MyCalenderEvent(cursor.getString(0), start,
-				end);
+				end, cursor.getString(3));
 
 		cursor.close();
 
