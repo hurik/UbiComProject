@@ -55,10 +55,15 @@ public class ApplicationData extends Application {
 						&& oldPosition.distance > Preferences.MAX_DISTANCE
 						&& System.currentTimeMillis()
 								- oldPosition.lastNotification > Preferences.MIN_TIME) {
-					Notify.sendNotification(
-							Phonebook.getContactName(context, number), this,
-							context);
-					lastNotification = System.currentTimeMillis();
+
+					if (!CalendarEvents.isBusy(getApplicationContext())) {
+						Notify.sendNotification(
+								Phonebook.getContactName(context, number),
+								this, context);
+						lastNotification = System.currentTimeMillis();
+					} else {
+						lastNotification = oldPosition.lastNotification;
+					}
 				} else {
 					// Nothing important happened, take on the old value
 					lastNotification = oldPosition.lastNotification;
