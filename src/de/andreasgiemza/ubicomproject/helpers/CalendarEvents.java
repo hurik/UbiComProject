@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract;
+import android.util.Log;
 
 /*
  * TODO
@@ -69,11 +70,15 @@ public final class CalendarEvents {
 		// delete all Events with more than MAX_EVENT_LENGHT Hours
 		while (true) {
 			if ((end_ms - start_ms) >= MAX_EVENT_LENGHT * MS_PER_HOUR) { // next
-																			// event?
-				if (!cursor.moveToNext())
-					return null;
+				Log.e("Termin", cursor.getString(0) + ": " +  (end_ms - start_ms) + " >= " + MAX_EVENT_LENGHT * MS_PER_HOUR);															// event?
+				if (!cursor.moveToNext()) {
+					return null;	// no next event
+				} else {	// get time from next event
+					start_ms = cursor.getLong(1);
+					end_ms = cursor.getLong(2);
+				}
 			} else {
-				break;
+				break;	// return, time is under MAX_EVENT_LENGHT
 			}
 		}
 
